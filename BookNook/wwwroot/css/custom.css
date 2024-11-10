@@ -1,0 +1,50 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+section {
+    padding: 20px;
+    margin: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #7E7AE4;
+    color: white;
+}
+
+#libros-recientes ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#libros-recientes li {
+    margin: 10px 0;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 28px;
+    color: #7E7AE4 !important; 
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
+    .navbar-nav .nav-item {
+        margin-left: 20px; 
+    }
+
+.nav-link {
+    color: black !important; 
+}
+
+    .nav-link:hover {
+        color: #333 !important; 
+    }

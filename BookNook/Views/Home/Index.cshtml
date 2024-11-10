@@ -1,8 +1,31 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";  // Usa el layout común
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<h1>Bienvenido a BookNook</h1>
+<p>¡Tu espacio para gestionar y disfrutar de tus libros!</p>
+
+<section id="estadisticas">
+    <h2>Estadísticas de Lectura</h2>
+    <div id="estadisticas-lectura">
+        <p><strong>Libros leídos este mes:</strong> 5</p>
+        <p><strong>Libros totales en tu colección:</strong> 20</p>
+    </div>
+</section>
+
+<section id="libros-recientes">
+    <h2>Libros Recientes</h2>
+    <ul>
+        <li><a href="#">Libro 1</a></li>
+        <li><a href="#">Libro 2</a></li>
+        <li><a href="#">Libro 3</a></li>
+    </ul>
+</section>
 </div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2024 - BookNook
+    </div>
+</footer>
