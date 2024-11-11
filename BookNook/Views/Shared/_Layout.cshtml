@@ -21,10 +21,10 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                          <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Registrarse</a>
+                            <a class="nav-link" asp-area="" asp-area="" asp-controller="Account" asp-action="Register">Registrarse</a>
                     </li>
                 </ul>
             </div>
@@ -37,9 +37,14 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
-            &copy; 2024 - BookNook - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div>&copy; 2024 - BookNook</div>
+            <div class="footer-links">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <a asp-area="" asp-controller="Home" asp-action="Terms">Terms</a>
+                <a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

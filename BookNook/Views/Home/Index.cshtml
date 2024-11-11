@@ -1,31 +1,29 @@
 ﻿@{
-    Layout = "_Layout";  // Usa el layout común
+    ViewData["Title"] = "Home";
 }
 
-
-<h1>Bienvenido a BookNook</h1>
-<p>¡Tu espacio para gestionar y disfrutar de tus libros!</p>
-
-<section id="estadisticas">
-    <h2>Estadísticas de Lectura</h2>
-    <div id="estadisticas-lectura">
-        <p><strong>Libros leídos este mes:</strong> 5</p>
-        <p><strong>Libros totales en tu colección:</strong> 20</p>
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Escape into your next great read</h1>
+        <div class="hero-text">
+            <p>Nuestra plataforma está diseñada para ayudarte a organizar tus lecturas, establecer tus metas y seguir tu progreso de manera fácil y divertida.</p>
+            <p>Disfruta de una experiencia única donde podrás llevar un registro detallado de tus libros, controlar tus objetivos de lectura y explorar nuevas formas de vivir tu pasión por la lectura.</p>
+            <p class="mt-4">¡Comienza a explorar y a vivir nuevas historias!</p>
+        </div>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-signup">Comenzar ahora</a>
     </div>
-</section>
-
-<section id="libros-recientes">
-    <h2>Libros Recientes</h2>
-    <ul>
-        <li><a href="#">Libro 1</a></li>
-        <li><a href="#">Libro 2</a></li>
-        <li><a href="#">Libro 3</a></li>
-    </ul>
-</section>
+    <div class="hero-image">
+        <svg viewBox="0 0 400 300" width="400" height="300">
+            <!-- Stylized book stack -->
+            <g transform="translate(100, 50)">
+                <path d="M20,180 L180,180 L160,40 L40,40 Z" fill="#e8e4f3" />
+                <path d="M40,170 L160,170 L150,60 L50,60 Z" fill="#d1c4e9" />
+                <path d="M60,160 L140,160 L135,80 L65,80 Z" fill="#b39ddb" />
+                <!-- Book details -->
+                <path d="M40,170 L160,170" stroke="#7E7AE4" stroke-width="2" fill="none" />
+                <path d="M50,160 L150,160" stroke="#7E7AE4" stroke-width="2" fill="none" />
+                <path d="M60,150 L140,150" stroke="#7E7AE4" stroke-width="2" fill="none" />
+            </g>
+        </svg>
+    </div>
 </div>
-
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2024 - BookNook
-    </div>
-</footer>
