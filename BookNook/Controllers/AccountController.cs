@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BookNook.Data;
+﻿using BookNook.Data;
 using BookNook.Models;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,11 +8,11 @@ namespace BookNook.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly BookNookContext _context;
+        private readonly BookNookContext _context;  
 
         public AccountController(BookNookContext context)
         {
-            _context = context;
+            _context = context;  
         }
 
         [HttpGet]
@@ -23,24 +22,51 @@ namespace BookNook.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public IActionResult Login(LoginViewModel model)
         {
-            string encryptedPassword = EncryptPassword(password);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
-            var user = _context.Usuarios.FirstOrDefault(u => u.Correo == email && u.Contraseña == encryptedPassword);
+            string encryptedPassword = EncryptPassword(model.Contraseña);
+            var user = _context.Usuarios.FirstOrDefault(u =>
+                u.Correo == model.Correo &&
+                u.Contraseña == encryptedPassword);
 
             if (user != null)
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.ErrorMessage = "Email o contraseña incorrectos";
-            return View();
+            ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
+            return View(model);
         }
 
         public IActionResult Register()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string encryptedPassword = EncryptPassword(model.Contraseña);
+                var user = new Usuarios
+                {
+                    Correo = model.Correo,
+                    Contraseña = encryptedPassword,
+                    Nombre = model.Nombre,
+                    Apellido = model.Apellido,
+                };
+
+                _context.Usuarios.Add(user);
+                _context.SaveChanges();
+                return RedirectToAction("Login");
+            }
+            return View(model);
         }
 
         private string EncryptPassword(string password)
