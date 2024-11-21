@@ -1,5 +1,8 @@
 ﻿using BookNook.Data;
+using BookNook.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookNook.Controllers
 {
@@ -7,7 +10,6 @@ namespace BookNook.Controllers
     {
         private readonly BookNookContext _context;
 
-        // Constructor para inyectar el contexto de la base de datos
         public InicioController(BookNookContext context)
         {
             _context = context;
@@ -15,22 +17,36 @@ namespace BookNook.Controllers
 
         public IActionResult Index()
         {
-            var userId = User.Identity.Name;  
+            var userId = User.Identity.Name; 
 
-            var estadisticas = _context.Lecturas
-                .Where(l => l.UsuarioId.ToString() == userId)  
-                .GroupBy(l => l.FechaInicio.Month)
-                .Select(g => new
-                {
-                    Mes = g.Key,
-                    LibrosLeidos = g.Count()
-                })
-                .ToList();
+            var objetivo = _context.ObjetivosLectura
+                .FirstOrDefault(o => o.UsuarioId.ToString() == userId && o.Año == DateTime.Now.Year);
 
-            ViewData["Estadisticas"] = estadisticas;
+            var lecturasRecientes = _context.Lecturas
+             .Where(l => l.UsuarioId.ToString() == userId)
+             .OrderByDescending(l => l.FechaInicio)
+             .Take(5)
+             .Include(l => l.Libro)  // Incluir la relación de Libro
+             .Select(l => new LecturaRecienteViewModel
+             {
+                 Titulo = l.Libro.Titulo,
+                 Autor = l.Libro.Autor,
+                 AvanceLectura = l.PaginaActual,  // O el campo que indique el avance de lectura
+                 Fecha = l.FechaInicio.ToString("dd/MM/yyyy"),
+                 ImagenPortada = l.Libro.ImagenPortada
+             })
+             .ToList();
 
-            return View();
+            var viewModel = new InicioViewModel
+            {
+                ObjetivoAnual = objetivo?.ObjetivoAnual ?? 0,
+                ProgresoAnual = objetivo?.ProgresoAnual ?? 0,
+                LecturasRecientes = lecturasRecientes  // Pasamos la lista de lecturas recientes al ViewModel
+            };
+
+            return View(viewModel); 
         }
+
 
         public IActionResult Biblioteca()
         {

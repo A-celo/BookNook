@@ -1,6 +1,9 @@
 ﻿using BookNook.Data;
 using BookNook.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -36,12 +39,23 @@ namespace BookNook.Controllers
 
             if (user != null)
             {
-                return RedirectToAction("Index", "Home");
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Nombre)
+        };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                return RedirectToAction("Index", "Inicio");
             }
 
             ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
             return View(model);
         }
+
 
         public IActionResult Register()
         {

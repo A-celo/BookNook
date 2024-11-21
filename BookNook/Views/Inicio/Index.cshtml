@@ -1,137 +1,36 @@
-﻿@{
+﻿@model BookNook.Models.InicioViewModel
+
+@{
     ViewData["Title"] = "Mi Biblioteca - Book Nook";
 }
 
-<div class="nav-container">
-    <a href="/" class="logo">Book Nook</a>
-    <div class="nav-links">
-        <a href="/" class="nav-link">Inicio</a>
-        <a href="/biblioteca" class="nav-link">Mi Biblioteca</a>
-        <a href="/lecturas" class="nav-link">Mis Lecturas</a>
-        <a href="/logros" class="nav-link">Mis Logros</a>
-        <span>|</span>
-        <a href="/perfil" class="nav-link">Perfil</a>
+<div class="stats-card">
+    <h2>Objetivo de lectura: @Model.ObjetivoAnual Libros</h2>
+    <p>Progreso: @Model.ProgresoAnual Libros leídos</p>
+</div>
+
+<div class="recent-reads">
+    <h2>Lecturas recientes</h2>
+    <div class="books-grid">
+        @foreach (var libro in Model.LecturasRecientes)
+        {
+            <div class="book-card">
+                <img src="@libro.ImagenPortada" alt="@libro.Titulo" class="book-cover">
+                <div class="book-info">
+                    <div>
+                        <h3>@libro.Titulo</h3>
+                        <p>@libro.Autor</p>
+                    </div>
+                    <div>
+                        <p>Lectura: @libro.AvanceLectura%</p>
+                        <p>@libro.Fecha</p>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
-<div class="reading-stats-container">
-    <div class="stats-card">
-        <h2>Objetivo de lectura: 20 Libros</h2>
-        <p>Libros leídos: 10/20</p>
-    </div>
 
-    <div class="reading-quote">
-        "Cada página que lees te acerca más a un nuevo mundo. ¡Sigue descubriendo y creciendo!"
-    </div>
 
-    <div class="recent-reads">
-        <h2>Lecturas recientes</h2>
-        <div class="books-grid">
-            <div class="book-card">
-                <img src="/images/divine-rivals.jpg" alt="Divine Rivals" class="book-cover">
-                <div class="book-info">
-                    <div>
-                        <h3>Divine Rivals</h3>
-                        <p>Rebecca Ross</p>
-                    </div>
-                    <div>
-                        <p>Lectura: 36%</p>
-                        <p>3/Nov/24</p>
-                    </div>
-                </div>
-            </div>
-            <div class="book-card">
-                <img src="/images/project-hail-mary.jpg" alt="Proyecto Hail Mary" class="book-cover">
-                <div class="book-info">
-                    <div>
-                        <h3>Proyecto Hail Mary</h3>
-                        <p>Andy Weir</p>
-                    </div>
-                    <div>
-                        <p>Lectura: 60%</p>
-                        <p>1/Nov/24</p>
-                    </div>
-                </div>
-            </div>
-            <div class="book-card">
-                <img src="/images/gemina.jpg" alt="Gemina" class="book-cover">
-                <div class="book-info">
-                    <div>
-                        <h3>Gemina</h3>
-                        <p>Amie Kaufman</p>
-                    </div>
-                    <div>
-                        <p>Lectura: 28%</p>
-                        <p>30/Oct/24</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="stats-section">
-        <h2>Estadísticas de Lectura</h2>
-        <div class="stats-grid">
-            <div class="chart-container">
-                <canvas id="monthlyChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="goalChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="genreChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script>
-        // Gráfico mensual
-        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-        new Chart(monthlyCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    data: [2, 3, 4, 2, 3, 2, 2, 3, 4, 3, 2, 1],
-                    backgroundColor: '#7E7AE4'
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // Gráfico de objetivo anual
-        const goalCtx = document.getElementById('goalChart').getContext('2d');
-        new Chart(goalCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Completado', 'Restante'],
-                datasets: [{
-                    data: [10, 10],
-                    backgroundColor: ['#7E7AE4', '#f5f3ff']
-                }]
-            }
-        });
-
-        // Gráfico de géneros
-        const genreCtx = document.getElementById('genreChart').getContext('2d');
-        new Chart(genreCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Ficción', 'No Ficción', 'Fantasía', 'Ciencia Ficción', 'Romance'],
-                datasets: [{
-                    data: [4, 2, 3, 2, 1],
-                    backgroundColor: ['#7E7AE4', '#9795E5', '#B0AEE6', '#C9C8E7', '#E2E1E8']
-                }]
-            }
-        });
-    </script>
-}

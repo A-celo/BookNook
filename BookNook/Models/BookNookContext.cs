@@ -1,4 +1,5 @@
 ﻿using BookNook.Models;
+using BookNook.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
@@ -15,7 +16,7 @@ namespace BookNook.Data
         public DbSet<Libro> Libros { get; set; }
         public DbSet<LibroEnLista> LibrosEnLista { get; set; }
         public DbSet<Lecturas> Lecturas { get; set; }
-        public DbSet<ObjetivoLectura> ObjetivosLectura { get; set; }
+        public DbSet<ObjetivosLectura> ObjetivosLectura { get; set; }
         public DbSet<EstadoLectura> EstadoLectura { get; set; }
         public DbSet<FormatoLibro> FormatosLibro { get; set; }
         public DbSet<Etiqueta> Etiquetas { get; set; }
@@ -33,4 +34,5 @@ namespace BookNook.Data
         }
     }
 }
+
 

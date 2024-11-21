@@ -5,11 +5,11 @@ namespace BookNook.Models
 {
     public class LoginViewModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "El campo Correo es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Correo electrónico no válido.")]
         public string Correo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Contraseña es obligatorio.")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; }
     }
