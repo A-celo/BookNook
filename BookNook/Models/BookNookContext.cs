@@ -2,6 +2,7 @@
 using BookNook.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookNook.Data
 {
@@ -18,7 +19,6 @@ namespace BookNook.Data
         public DbSet<Lecturas> Lecturas { get; set; }
         public DbSet<ObjetivosLectura> ObjetivosLectura { get; set; }
         public DbSet<EstadoLectura> EstadoLectura { get; set; }
-        public DbSet<FormatoLibro> FormatosLibro { get; set; }
         public DbSet<Etiqueta> Etiquetas { get; set; }
         public DbSet<EtiquetaLibro> EtiquetasLibro { get; set; }
 

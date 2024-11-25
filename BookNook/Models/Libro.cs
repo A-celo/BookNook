@@ -20,36 +20,37 @@ namespace BookNook.Models
 
         [Column("ano_publicacion")]
         [Range(1000, 9999, ErrorMessage = "El año de publicación debe ser un valor entre 1000 y 9999.")]
-        public int AnoPublicacion { get; set; }
+        public int? AnoPublicacion { get; set; }
 
         [StringLength(50, ErrorMessage = "El idioma no puede exceder los 50 caracteres.")]
-        public string Idioma { get; set; }
+        public string? Idioma { get; set; }
 
         [StringLength(255, ErrorMessage = "El género no puede exceder los 255 caracteres.")]
-        public string Genero { get; set; }
+        public string? Genero { get; set; }
 
         [StringLength(255, ErrorMessage = "El subgénero no puede exceder los 255 caracteres.")]
-        public string Subgenero { get; set; }
+        public string? Subgenero { get; set; }
 
         [Column("numero_paginas")]
         [Range(1, int.MaxValue, ErrorMessage = "El número de páginas debe ser un valor positivo.")]
-        public int NumeroPaginas { get; set; }
+        public int? NumeroPaginas { get; set; }
 
         [Column("duracion_audio")]
         [Range(1, int.MaxValue, ErrorMessage = "La duración del audio debe ser un valor positivo.")]
-        public int DuracionAudio { get; set; }
+        public int? DuracionAudio { get; set; }
 
         [Column("imagen_portada")]
-        [StringLength(255, ErrorMessage = "La imagen de portada no puede exceder los 255 caracteres.")]
-        public string ImagenPortada { get; set; }
+        public string? ImagenPortada { get; set; }
 
         [StringLength(1000, ErrorMessage = "La sinopsis no puede exceder los 1000 caracteres.")]
-        public string Sinopsis { get; set; }
+        public string? Sinopsis { get; set; }
 
         [Column("creado_en")]
-        public DateTime CreadoEn { get; set; }
+        public DateTime? CreadoEn { get; set; }
 
         [Column("actualizado_en")]
-        public DateTime ActualizadoEn { get; set; }
+        public DateTime? ActualizadoEn { get; set; }
+
+        public ICollection<EtiquetaLibro> EtiquetasLibros { get; set; }
     }
 }

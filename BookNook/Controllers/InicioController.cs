@@ -17,40 +17,79 @@ namespace BookNook.Controllers
 
         public IActionResult Index()
         {
-            var userId = User.Identity.Name; 
+            var userEmail = User.Identity.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user = _context.Usuarios.FirstOrDefault(u => u.Correo == userEmail);
+
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
             var objetivo = _context.ObjetivosLectura
-                .FirstOrDefault(o => o.UsuarioId.ToString() == userId && o.Año == DateTime.Now.Year);
+            .Where(o => o.UsuarioId == user.Id && o.Año == DateTime.Now.Year)
+            .Select(o => new
+            {
+                o.ObjetivoAnual,
+                o.ProgresoAnual
+            })
+            .FirstOrDefault();
 
             var lecturasRecientes = _context.Lecturas
-             .Where(l => l.UsuarioId.ToString() == userId)
-             .OrderByDescending(l => l.FechaInicio)
-             .Take(5)
-             .Include(l => l.Libro)  // Incluir la relación de Libro
-             .Select(l => new LecturaRecienteViewModel
-             {
-                 Titulo = l.Libro.Titulo,
-                 Autor = l.Libro.Autor,
-                 AvanceLectura = l.PaginaActual,  // O el campo que indique el avance de lectura
-                 Fecha = l.FechaInicio.ToString("dd/MM/yyyy"),
-                 ImagenPortada = l.Libro.ImagenPortada
-             })
-             .ToList();
+            .Where(l => l.UsuarioId == user.Id)
+            .OrderByDescending(l => l.FechaInicio)
+            .Take(5)
+            .Include(l => l.Libro)
+            .Select(l => new LecturaRecienteViewModel
+            {
+                Titulo = l.Libro != null ? l.Libro.Titulo : "Título no disponible",
+                Autor = l.Libro != null ? l.Libro.Autor : "Autor no disponible",
+                ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "", 
+                AvanceLectura = l.PaginaActual ?? 0,
+                Fecha = l.FechaInicio.HasValue
+                    ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
+                    : "", 
+            })
+            .ToList();
+
 
             var viewModel = new InicioViewModel
             {
                 ObjetivoAnual = objetivo?.ObjetivoAnual ?? 0,
                 ProgresoAnual = objetivo?.ProgresoAnual ?? 0,
-                LecturasRecientes = lecturasRecientes  // Pasamos la lista de lecturas recientes al ViewModel
+                LecturasRecientes = lecturasRecientes  
             };
 
             return View(viewModel); 
         }
-
-
-        public IActionResult Biblioteca()
+        public ActionResult Biblioteca()
         {
-            return View();
+            var librosConLecturas = from libro in _context.Libros
+                                    join lectura in _context.Lecturas
+                                    on libro.Id equals lectura.LibroId into lecturaGroup
+                                    from lectura in lecturaGroup.DefaultIfEmpty()
+                                    select new LibroConLecturaViewModel
+                                    {
+                                        Titulo = libro.Titulo ?? "Sin título",
+                                        Autor = libro.Autor ?? "Sin autor",
+                                        ImagenPortada = libro.ImagenPortada ?? "",
+                                        Progreso = lectura != null ?
+                                            (lectura.PaginaActual ?? 0) : 0,
+                                        FechaInicio = lectura != null ?
+                                            lectura.FechaInicio : null,
+                                        FechaFin = lectura != null ?
+                                            lectura.FechaFin : null
+                                    };
+
+            // Ejecutamos la consulta y convertimos a lista
+            var model = librosConLecturas.ToList();
+
+            return View(model);
         }
 
         public IActionResult Lecturas()

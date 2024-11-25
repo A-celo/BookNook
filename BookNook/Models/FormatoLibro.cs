@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookNook.Models
 {
+    [Table("formatos_libro")]
     public class FormatoLibro
     {
         public int Id { get; set; }

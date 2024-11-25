@@ -22,7 +22,7 @@
                         <p>@libro.Autor</p>
                     </div>
                     <div>
-                        <p>Lectura: @libro.AvanceLectura%</p>
+                        <p>Lectura: @(libro.AvanceLectura.HasValue ? libro.AvanceLectura.Value.ToString() : "Sin avance")%</p>
                         <p>@libro.Fecha</p>
                     </div>
                 </div>

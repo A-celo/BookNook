@@ -20,12 +20,38 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                          <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
-                    </li>
-                    <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-area="" asp-controller="Account" asp-action="Register">Registrarse</a>
-                    </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Inicio" asp-action="Index">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Books" asp-action="Biblioteca">Mi Biblioteca</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Lecturas" asp-action="Index">Mis Lecturas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Inicio" asp-action="Logros">Mis Logros</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Inicio" asp-action="Perfil">Perfil</a>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Registrarse</a>
+                            </li>
+                        }
                 </ul>
             </div>
         </div>

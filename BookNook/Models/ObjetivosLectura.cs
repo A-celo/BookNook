@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BookNook.Migrations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookNook.Models
@@ -29,5 +30,11 @@ namespace BookNook.Models
 
         [Column("actualizado_en")]
         public DateTime ActualizadoEn { get; set; }
+
+        [Column("libros_leidos")]
+        public int LibrosLeidos {get; set; }
+
+        [Column("libros_restantes")]
+        public int LibrosRestantes{get; set; }
     }
 }

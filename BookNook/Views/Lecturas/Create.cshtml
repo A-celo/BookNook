@@ -1,0 +1,66 @@
+﻿@model BookNook.Models.Lecturas
+
+@{
+    ViewData["Title"] = "Registrar Lectura";
+}
+
+<h1>Registrar Lectura</h1>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label for="LibroId">Libro</label>
+        <select asp-for="LibroId" class="form-control" asp-items="@(new SelectList(ViewBag.Libros, "Id", "Titulo"))">
+            <option value="">Seleccionar un libro...</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="EstadoId">Estado</label>
+        <select asp-for="EstadoId" class="form-control" asp-items="@(new SelectList(ViewBag.Estados, "Id", "Nombre"))" id="estado-lectura">
+            <option value="">Seleccionar estado...</option>
+        </select>
+    </div>
+
+    <div id="campos-leyendo" style="display: none;">
+        <div class="form-group">
+            <label for="FechaInicio">Fecha de Inicio</label>
+            <input asp-for="FechaInicio" class="form-control" type="date" />
+        </div>
+        <div class="form-group">
+            <label for="PaginaActual">Página Actual</label>
+            <input asp-for="PaginaActual" class="form-control" type="number" />
+        </div>
+    </div>
+
+    <div id="campos-terminado" style="display: none;">
+        <div class="form-group">
+            <label for="FechaInicio">Fecha de Inicio</label>
+            <input asp-for="FechaInicio" class="form-control" type="date" />
+        </div>
+        <div class="form-group">
+            <label for="FechaFin">Fecha de Fin</label>
+            <input asp-for="FechaFin" class="form-control" type="date" />
+        </div>
+        <div class="form-group">
+            <label for="Calificacion">Calificación</label>
+            <input asp-for="Calificacion" class="form-control" type="number" min="0" max="10" />
+        </div>
+        <div class="form-group">
+            <label for="Notas">Notas</label>
+            <textarea asp-for="Notas" class="form-control"></textarea>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-signup">Guardar</button>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById("estado-lectura").addEventListener("change", function () {
+            const estado = this.value;
+            document.getElementById("campos-leyendo").style.display = estado === "1" ? "block" : "none";
+            document.getElementById("campos-terminado").style.display = estado === "2" ? "block" : "none";
+        });
+    </script>
+}
+

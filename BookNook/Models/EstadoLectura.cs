@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookNook.Models
 {
+    [Table("estado_lectura")]
     public class EstadoLectura
     {
         public int Id { get; set; }

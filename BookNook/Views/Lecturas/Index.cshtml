@@ -1,0 +1,44 @@
+﻿@model IEnumerable<BookNook.Models.Lecturas>
+
+@{
+    ViewData["Title"] = "Mis Lecturas";
+}
+
+<h1>Mis Lecturas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-signup">Agregar Lectura</a>
+</p>
+
+<div class="books-grid">
+    @foreach (var item in Model)
+    {
+        <div class="book-card">
+            <img src="@item.Libro.ImagenPortada" alt="@item.Libro.Titulo" class="book-cover">
+            <div class="book-info">
+                <h3>@item.Libro.Titulo</h3>
+                <p><strong>Autor:</strong> @item.Libro.Autor</p>
+                <p><strong>Progreso:</strong> @item.EstadoId</p>
+                <p><strong>Fecha de inicio:</strong> @item.FechaInicio?.ToString("dd/MM/yyyy")</p>
+                <p><strong>Última actualización:</strong> @item.FechaFin?.ToString("dd/MM/yyyy")</p>
+                @if (item.EstadoId == 1)
+                {
+                    <p>
+                        <strong>Calificación:</strong>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= item.Calificacion ? "filled" : "")">★</span>
+                        }
+                    </p>
+                    <p><strong>Tags:</strong> @string.Join(", ", item.Libro.EtiquetasLibros)</p>
+                }
+                <div class="book-actions">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

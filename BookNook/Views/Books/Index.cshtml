@@ -1,0 +1,73 @@
+﻿@model IEnumerable<BookNook.Models.BookViewModel>
+
+@{
+    ViewData["Title"] = "Mi Biblioteca";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-4">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="container">
+    <div class="reading-stats-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="position-relative" style="flex: 1; max-width: 500px;">
+                @using (Html.BeginForm("Search", "Books", FormMethod.Get))
+                {
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar" style="padding-right: 40px;" />
+                    <button type="submit" class="btn position-absolute" style="right: 0; top: 0; border: none;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                }
+            </div>
+            <a href="@Url.Action("Add", "Books")" class="btn btn-signup">
+                <i class="fas fa-plus"></i> Agregar libro
+            </a>
+        </div>
+
+        <div class="mb-4">
+            <div class="btn-group">
+                <button class="btn @(ViewBag.Filter == "Todos" ? "btn-signup" : "btn-outline-secondary")" onclick="location.href='@Url.Action("Biblioteca", "Books", new { filter = "Todos" })'">Todos</button>
+                <button class="btn @(ViewBag.Filter == "PorLeer" ? "btn-signup" : "btn-outline-secondary")" onclick="location.href='@Url.Action("Biblioteca", "Books", new { filter = "PorLeer" })'">Por Leer</button>
+                <button class="btn @(ViewBag.Filter == "Leidos" ? "btn-signup" : "btn-outline-secondary")" onclick="location.href='@Url.Action("Biblioteca", "Books", new { filter = "Leidos" })'">Leídos</button>
+                <button class="btn @(ViewBag.Filter == "Favoritos" ? "btn-signup" : "btn-outline-secondary")" onclick="location.href='@Url.Action("Biblioteca", "Books", new { filter = "Favoritos" })'">Favoritos</button>
+                <button class="btn @(ViewBag.Filter == "Wishlist" ? "btn-signup" : "btn-outline-secondary")" onclick="location.href='@Url.Action("Biblioteca", "Books", new { filter = "Wishlist" })'">Wishlist</button>
+            </div>
+        </div>
+
+        <div class="books-grid">
+            @foreach (var book in Model)
+            {
+                <div class="book-card">
+                    <img src="@book.ImagenPortada" alt="@book.Titulo" class="book-cover" />
+                    <div class="book-info">
+                        <div>
+                            <h5 class="mb-1">@book.Titulo</h5>
+                            <p class="text-muted mb-2">@book.Autor</p>
+                            <div class="mb-2">
+                                @if (book.Progreso > 0)
+                                {
+                                    <small class="text-muted">Lectura: @book.Progreso%</small>
+                                }
+                                @if (book.FechaInicio.HasValue && book.FechaFin.HasValue)
+                                {
+                                    <br />
+                                    <small class="text-muted">@book.FechaInicio.Value.ToString("dd/MM/yy") - @book.FechaFin.Value.ToString("dd/MM/yy")</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+}
+
+

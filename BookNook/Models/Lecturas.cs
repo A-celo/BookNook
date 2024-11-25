@@ -8,24 +8,16 @@ namespace BookNook.Models
         public int Id { get; set; }
 
         [Column("usuario_id")]
-        [Required(ErrorMessage = "El ID del usuario es obligatorio.")]
         public int UsuarioId { get; set; }
 
         [Column("libro_id")]
-        [Required(ErrorMessage = "El ID del libro es obligatorio.")]
         public int LibroId { get; set; }
 
-        [Column("formato_id")]
-        [Required(ErrorMessage = "El ID del formato es obligatorio.")]
-        public int FormatoId { get; set; }
-
         [Column("estado_id")]
-        [Required(ErrorMessage = "El ID del estado es obligatorio.")]
         public int EstadoId { get; set; }
 
         [Column("fecha_inicio")]
-        [Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
-        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaInicio { get; set; }
 
         [Column("fecha_fin")]
         public DateTime? FechaFin { get; set; }
@@ -47,13 +39,13 @@ namespace BookNook.Models
         public decimal? Calificacion { get; set; }
 
         [StringLength(1000, ErrorMessage = "Las notas no pueden exceder los 1000 caracteres.")]
-        public string Notas { get; set; }
+        public string? Notas { get; set; }
 
         [Column("creado_en")]
-        public DateTime CreadoEn { get; set; }
+        public DateTime? CreadoEn { get; set; }
 
         [Column("actualizado_en")]
-        public DateTime ActualizadoEn { get; set; }
+        public DateTime? ActualizadoEn { get; set; }
 
         public Libro Libro { get; set; }
     }
