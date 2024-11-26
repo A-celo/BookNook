@@ -49,12 +49,15 @@ namespace BookNook.Controllers
             {
                 Titulo = l.Libro != null ? l.Libro.Titulo : "Título no disponible",
                 Autor = l.Libro != null ? l.Libro.Autor : "Autor no disponible",
-                ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "", 
-                AvanceLectura = l.PaginaActual ?? 0,
-                Fecha = l.FechaInicio.HasValue
-                    ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
-                    : "", 
+                ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "",
+                AvanceLectura = l.PaginaActual.HasValue
+                    ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1)) 
+                    : (l.FechaFin.HasValue ? 100 : 0), 
+                Fecha = l.FechaInicio.HasValued
+                ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
+                : "",
             })
+
             .ToList();
 
 
@@ -86,7 +89,6 @@ namespace BookNook.Controllers
                                             lectura.FechaFin : null
                                     };
 
-            // Ejecutamos la consulta y convertimos a lista
             var model = librosConLecturas.ToList();
 
             return View(model);

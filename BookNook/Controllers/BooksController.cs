@@ -22,46 +22,67 @@ namespace BookNook.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+
+            var booksQuery = _context.Libros.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                booksQuery = booksQuery.Where(b => b.Titulo.Contains(searchTerm) || b.Autor.Contains(searchTerm));
+            }
+
             var lecturasQuery = _context.Lecturas
-                .Include(l => l.Libro)
-                .Where(l => l.UsuarioId == int.Parse(userId))
-                .AsQueryable();
+            .Where(l => l.UsuarioId == int.Parse(userId))
+            .Include(l => l.Libro)
+            .AsQueryable();
+
             switch (filter)
             {
                 case "PorLeer":
                     lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 2);
                     break;
+                case "Leyendo":
+                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 3);
+                    break;
                 case "Leidos":
                     lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 1);
                     break;
-                case "Favoritos":
-                    lecturasQuery = lecturasQuery.Where(l => l.Notas.Contains("Favorito"));
+                case "DNF":
+                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 5);  
                     break;
-                case "Wishlist":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 4);
+                default:  
+                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId != 0); 
                     break;
             }
-            if (!string.IsNullOrEmpty(searchTerm))
+
+            var filteredBookIds = lecturasQuery.Select(l => l.LibroId).Distinct().ToList();
+
+            if (filter != "Todos")
             {
-                lecturasQuery = lecturasQuery.Where(l => l.Libro.Titulo.Contains(searchTerm) || l.Libro.Autor.Contains(searchTerm));
+                booksQuery = booksQuery.Where(b => filteredBookIds.Contains(b.Id));
             }
-            var model = _context.Lecturas
-            .Include(l => l.Libro)
-            .Where(l => l.UsuarioId == int.Parse(userId))
-            .Select(l => new BookViewModel
+
+            var model = booksQuery
+            .Select(b => new BookViewModel
             {
-                Titulo = l.Libro.Titulo ?? "Sin título",
-                Autor = l.Libro.Autor ?? "Sin autor",
-                ImagenPortada = l.Libro.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
-                Progreso = l.PaginaActual.HasValue && l.Libro.NumeroPaginas > 0
-                    ? (int?)(l.PaginaActual.Value * 100 / l.Libro.NumeroPaginas)
-                    : null,
-                FechaInicio = l.FechaInicio,
-                FechaFin = l.FechaFin,
+                Titulo = b.Titulo ?? "Sin título",
+                Autor = b.Autor ?? "Sin autor",
+                ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
+                Progreso = lecturasQuery
+                    .Where(l => l.LibroId == b.Id)
+                    .Select(l => (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas))
+                    .FirstOrDefault(),
+                FechaInicio = lecturasQuery
+                    .Where(l => l.LibroId == b.Id)
+                    .Select(l => l.FechaInicio)
+                    .FirstOrDefault(),
+                FechaFin = lecturasQuery
+                    .Where(l => l.LibroId == b.Id)
+                    .Select(l => l.FechaFin)
+                    .FirstOrDefault(),
                 Etiquetas = new List<string>
                 {
-                    l.Libro.Genero ?? "Sin género",
-                    l.Libro.Subgenero ?? "Sin subgénero"
+                    b.Genero ?? "Sin género",
+                    b.Subgenero ?? "Sin subgénero"
                 }
             })
             .ToList();
@@ -128,6 +149,56 @@ namespace BookNook.Controllers
                 TempData["SuccessMessage"] = "El libro se ha agregado con éxito.";
                 return RedirectToAction("Index", "Library");
             }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddLectura()
+        {
+            var libros = await _context.Libros.Select(l => new SelectListItem { Value = l.Id.ToString(), Text = l.Titulo }).ToListAsync();
+
+            var model = new LecturaViewModel
+            {
+                Libros = libros
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddLectura(LecturaViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var lectura = new Lecturas
+                {
+                    LibroId = model.LibroId,
+                    EstadoId = model.EstadoId,
+                    FechaInicio = model.FechaInicio,
+                    FechaFin = model.FechaFin,
+                    Calificacion = model.Calificacion,
+                    Notas = model.Notas,
+                    PaginaActual = model.PaginaActual
+                };
+
+                _context.Lecturas.Add(lectura);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Lectura agregada exitosamente.";
+                return RedirectToAction("Biblioteca", "Books");
+            }
+
+            var libros = await _context.Libros
+            .Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Titulo
+            })
+            .ToListAsync();
+
+            model.Libros = libros;
 
             return View(model);
         }

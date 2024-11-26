@@ -2,47 +2,71 @@
 using Microsoft.EntityFrameworkCore;
 using BookNook.Models;
 using BookNook.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-public class LecturasController : Controller
+namespace BookNook.Controllers
 {
-    private readonly BookNookContext _context;
-
-    public LecturasController(BookNookContext context)
+    public class LecturasController : Controller
     {
-        _context = context;
-    }
+        private readonly BookNookContext _context;
 
-    public async Task<IActionResult> Index()
-    {
-        var lecturas = await _context.Lecturas
-            .Include(l => l.Libro)
-            .ToListAsync();
-        return View(lecturas); 
-    }
-
-    public IActionResult Create()
-    {
-        ViewBag.Libros = _context.Libros.Select(l => new { l.Id, l.Titulo, l.Autor, l.Genero }).ToList();
-        ViewBag.Estados = _context.EstadoLectura.Select(e => new { e.Id, e.Nombre }).ToList();
-        return View();
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Lecturas lectura)
-    {
-        if (ModelState.IsValid)
+        public LecturasController(BookNookContext context)
         {
-            lectura.CreadoEn = DateTime.Now;
-            _context.Add(lectura);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            _context = context;
         }
 
-        ViewBag.Libros = _context.Libros.Select(l => new { l.Id, l.Titulo, l.Autor, l.Genero }).ToList();
-        ViewBag.Estados = _context.EstadoLectura.Select(e => new { e.Id, e.Nombre }).ToList();
-        return View(lectura);
-    }
+        public IActionResult Add()
+        {
+            var model = new NewLecturaViewModel
+            {
+                Libros = _context.Libros.Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Titulo
+                }).ToList()
+            };
+            return View(model);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> Add(NewLecturaViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var lectura = new Lecturas
+                {
+                    UsuarioId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value),
+                    LibroId = model.LibroId,
+                    EstadoId = model.EstadoId,
+                    FechaInicio = model.FechaInicio,
+                    FechaFin = model.FechaFin,
+                    PaginaActual = model.PaginaActual,
+                    Calificacion = model.Calificacion,
+                    Notas = model.Notas,
+                    CreadoEn = DateTime.Now,
+                    ActualizadoEn = DateTime.Now
+                };
+
+                _context.Lecturas.Add(lectura);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "La lectura se ha agregado con éxito.";
+                return RedirectToAction("Biblioteca", "Books");
+            }
+
+            model.Libros = _context.Libros.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Titulo
+            }).ToList();
+
+            return View(model);
+        }
+    }
 }
+
+
+
+
 

@@ -1,0 +1,71 @@
+﻿@model BookNook.Models.LecturaViewModel
+
+@{
+    ViewData["Title"] = "Agregar Lectura";
+}
+
+<form asp-controller="Books" asp-action="AddLectura" method="post">
+    <div class="form-group">
+        <label for="LibroId">Libro</label>
+        <select asp-for="LibroId" class="form-control" asp-items="Model.Libros"></select>
+        <span asp-validation-for="LibroId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="EstadoId">Estado</label>
+        <select asp-for="EstadoId" class="form-control">
+            <option value="1">Leído</option>
+            <option value="2">Por Leer</option>
+            <option value="3">Leyendo</option>
+            <option value="4">DNF</option>
+        </select>
+        <span asp-validation-for="EstadoId" class="text-danger"></span>
+    </div>
+
+    <div id="dynamic-fields"></div>
+
+    <button type="submit" class="btn btn-primary">Agregar Lectura</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#EstadoId').change(function () {
+                var estado = $(this).val();
+                $('#dynamic-fields').empty();
+
+                if (estado == "1") { //leído
+                    $('#dynamic-fields').append(`
+                                <div class="form-group">
+                                    <label for="FechaInicio">Fecha de inicio</label>
+                                    <input type="date" id="FechaInicio" name="FechaInicio" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="FechaFin">Fecha de fin</label>
+                                    <input type="date" id="FechaFin" name="FechaFin" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="Calificacion">Calificación</label>
+                                    <input type="number" id="Calificacion" name="Calificacion" class="form-control" min="0" max="10" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="Notas">Notas</label>
+                                    <textarea id="Notas" name="Notas" class="form-control"></textarea>
+                                </div>
+                            `);
+                } else if (estado == "3") { //leyendo
+                    $('#dynamic-fields').append(`
+                                <div class="form-group">
+                                    <label for="FechaInicio">Fecha de inicio</label>
+                                    <input type="date" id="FechaInicio" name="FechaInicio" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="PaginaActual">Página actual</label>
+                                    <input type="number" id="PaginaActual" name="PaginaActual" class="form-control" />
+                                </div>
+                            `);
+                }
+            });
+        });
+    </script>
+}
