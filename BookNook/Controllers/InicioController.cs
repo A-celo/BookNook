@@ -53,7 +53,7 @@ namespace BookNook.Controllers
                 AvanceLectura = l.PaginaActual.HasValue
                     ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1)) 
                     : (l.FechaFin.HasValue ? 100 : 0), 
-                Fecha = l.FechaInicio.HasValued
+                Fecha = l.FechaInicio.HasValue
                 ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
                 : "",
             })
