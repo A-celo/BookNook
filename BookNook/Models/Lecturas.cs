@@ -25,14 +25,20 @@ namespace BookNook.Models
         [Column("pagina_actual")]
         [Range(0, int.MaxValue, ErrorMessage = "La página actual debe ser un valor positivo.")]
         public int? PaginaActual { get; set; }
+        /*
+         
+        ESTAS COLUMNAS NO EXISTEN EN TU TABLA DE LA BD
 
-        [Column("tiempo_actual")]
+         [Column("tiempo_actual")]
         [Range(0, int.MaxValue, ErrorMessage = "El tiempo actual debe ser un valor positivo.")]
         public int? TiempoActual { get; set; }
 
         [Column("tiempo_lectura")]
         [Range(0, int.MaxValue, ErrorMessage = "El tiempo de lectura debe ser un valor positivo.")]
         public int? TiempoLectura { get; set; }
+         
+         */
+        
 
         [Column("calificacion")]
         [Range(0, 10, ErrorMessage = "La calificación debe estar entre 0 y 10.")]
