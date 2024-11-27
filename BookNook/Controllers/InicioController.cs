@@ -2,6 +2,7 @@
 using BookNook.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace BookNook.Controllers
@@ -31,11 +32,9 @@ namespace BookNook.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Buscar el objetivo para el año actual
             var objetivo = _context.ObjetivosLectura
                 .FirstOrDefault(o => o.UsuarioId == user.Id && o.Año == DateTime.Now.Year);
 
-            // Si no existe un objetivo para este año, redirigir a establecer objetivo
             if (objetivo == null)
             {
                 return RedirectToAction("Objetivo", "Objetivo");
@@ -56,8 +55,14 @@ namespace BookNook.Controllers
                 _context.SaveChanges();
             }
 
+            var primerDiaMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var primerDiaSiguienteMes = primerDiaMes.AddMonths(1);
+
             var lecturasRecientes = _context.Lecturas
-                .Where(l => l.UsuarioId == user.Id)
+                .Where(l => l.UsuarioId == user.Id &&
+                            l.FechaInicio.HasValue &&
+                            l.FechaInicio.Value >= primerDiaMes &&
+                            l.FechaInicio.Value < primerDiaSiguienteMes)
                 .OrderByDescending(l => l.FechaInicio)
                 .Take(5)
                 .Include(l => l.Libro)
@@ -75,11 +80,47 @@ namespace BookNook.Controllers
                 })
                 .ToList();
 
+            var lecturasMensuales = _context.Lecturas
+                .Where(l => l.UsuarioId == user.Id &&
+                            l.FechaFin.HasValue &&
+                            l.FechaFin.Value.Year == DateTime.Now.Year)
+                .GroupBy(l => l.FechaFin.Value.Month)
+                .Select(g => new
+                {
+                    Mes = g.Key,
+                    Cantidad = g.Count()
+                })
+                .ToList()
+                .Select(g => new LecturaMensual
+                {
+                    Mes = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Mes),
+                    Cantidad = g.Cantidad
+                })
+                .OrderBy(l => DateTime.ParseExact(l.Mes, "MMM", CultureInfo.CurrentCulture).Month)
+                .ToList();
+
+            var generos = _context.Lecturas
+               .Where(l => l.UsuarioId == user.Id &&
+                           (l.FechaFin.HasValue || l.FechaInicio.HasValue) && 
+                           (!l.FechaFin.HasValue || l.FechaFin.Value.Year == DateTime.Now.Year)) 
+               .Include(l => l.Libro)
+               .Where(l => l.Libro.Genero != null)
+               .GroupBy(l => l.Libro.Genero)
+               .Select(g => new GeneroLectura
+               {
+                   Nombre = g.Key,
+                   Valor = g.Count()
+               })
+               .OrderByDescending(g => g.Valor)
+               .ToList();
+
             var viewModel = new InicioViewModel
             {
                 ObjetivoAnual = objetivo.ObjetivoAnual,
                 ProgresoAnual = librosCompletadosEsteAño,
-                LecturasRecientes = lecturasRecientes
+                LecturasRecientes = lecturasRecientes,
+                LecturasPorMes = lecturasMensuales,
+                GenerosPorcentaje = generos
             };
 
             return View(viewModel);

@@ -31,6 +31,231 @@
     </div>
 </div>
 
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Libros leídos por mes</h3>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Progreso del objetivo</h3>
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Distribución por género</h3>
+                    <canvas id="genreChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const monthlyData = @Html.Raw(Json.Serialize(Model.LecturasPorMes));
+            const genreData = @Html.Raw(Json.Serialize(Model.GenerosPorcentaje));
+            const objetivo = @Json.Serialize(Model.ObjetivoAnual);
+            const progreso = @Json.Serialize(Model.ProgresoAnual);
 
+            const colors = {
+                primary: '#7E7AE4',
+                secondary: '#6C63FF',
+                accent: '#4834DF',
+                light: '#E9ECEF',
+                gradient: ['#7E7AE4', '#6C63FF', '#4834DF', '#3B27BA', '#251C7A']
+            };
+
+            Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+            Chart.defaults.font.size = 13;
+            Chart.defaults.color = '#495057';
+
+            const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+                type: 'bar',
+                data: {
+                    labels: monthlyData.map(d => d.mes),
+                    datasets: [{
+                        label: 'Libros leídos',
+                        data: monthlyData.map(d => d.cantidad),
+                        backgroundColor: colors.primary,
+                        borderRadius: 6,
+                        maxBarThickness: 35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.parsed.y} libros`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            grid: {
+                                drawBorder: false,
+                                color: '#f0f0f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            const progressChart = new Chart(document.getElementById('progressChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completado', 'Restante'],
+                    datasets: [{
+                        data: [progreso, Math.max(0, objetivo - progreso)],
+                        backgroundColor: [colors.primary, colors.light],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    afterDraw: function (chart) {
+                        const width = chart.width;
+                        const height = chart.height;
+                        const ctx = chart.ctx;
+                        ctx.restore();
+
+                        const fontSize = (height / 114).toFixed(2);
+                        ctx.font = fontSize + 'em sans-serif';
+                        ctx.textBaseline = 'middle';
+
+                        const text = `${progreso}/${objetivo}`;
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height / 2;
+
+                        ctx.fillStyle = '#000';
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }]
+            });
+
+            const genreChart = new Chart(document.getElementById('genreChart'), {
+                type: 'pie',
+                data: {
+                    labels: genreData.map(d => d.nombre),
+                    datasets: [{
+                        data: genreData.map(d => d.valor),
+                        backgroundColor: colors.gradient,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.label}: ${context.parsed} libros`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .card {
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+        .card-title {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        canvas {
+            min-height: 300px;
+            max-height: 300px;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+    </style>
+}

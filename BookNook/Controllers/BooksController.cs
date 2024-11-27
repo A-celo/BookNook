@@ -30,10 +30,11 @@ namespace BookNook.Controllers
                 booksQuery = booksQuery.Where(b => b.Titulo.Contains(searchTerm) || b.Autor.Contains(searchTerm));
             }
 
-            var lecturasQuery = _context.Lecturas
-            .Where(l => l.UsuarioId == int.Parse(userId))
-            .Include(l => l.Libro)
-            .AsQueryable();
+            var baseQuery = _context.Lecturas
+                .Where(l => l.UsuarioId == int.Parse(userId))
+                .Include(l => l.Libro);
+
+            var lecturasQuery = baseQuery.AsQueryable();
 
             switch (filter)
             {
@@ -47,10 +48,10 @@ namespace BookNook.Controllers
                     lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 1);
                     break;
                 case "DNF":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 5);  
+                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 5);
                     break;
-                default:  
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId != 0); 
+                default:
+                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId != 0);
                     break;
             }
 
@@ -62,34 +63,34 @@ namespace BookNook.Controllers
             }
 
             var model = booksQuery
-            .Select(b => new BookViewModel
-            {
-                Id = b.Id,
-                Titulo = b.Titulo ?? "Sin título",
-                Autor = b.Autor ?? "Sin autor",
-                ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
-                Progreso = lecturasQuery
-                    .Where(l => l.LibroId == b.Id)
-                    .Select(l =>
-                        l.EstadoId == 1 ? 100 :
-                        (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas)
-                    )
-                    .FirstOrDefault(),
-                FechaInicio = lecturasQuery
-                    .Where(l => l.LibroId == b.Id)
-                    .Select(l => l.FechaInicio)
-                    .FirstOrDefault(),
-                FechaFin = lecturasQuery
-                    .Where(l => l.LibroId == b.Id)
-                    .Select(l => l.FechaFin)
-                    .FirstOrDefault(),
-                Etiquetas = new List<string>
+                .Select(b => new BookViewModel
                 {
-                    b.Genero ?? "Sin género",
-                    b.Subgenero ?? "Sin subgénero"
-                }
-            })
-            .ToList();
+                    Id = b.Id,
+                    Titulo = b.Titulo ?? "Sin título",
+                    Autor = b.Autor ?? "Sin autor",
+                    ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
+                    Progreso = baseQuery  
+                        .Where(l => l.LibroId == b.Id)
+                        .Select(l =>
+                            l.EstadoId == 1 ? 100 :
+                            (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas)
+                        )
+                        .FirstOrDefault(),
+                    FechaInicio = baseQuery  
+                        .Where(l => l.LibroId == b.Id)
+                        .Select(l => l.FechaInicio)
+                        .FirstOrDefault(),
+                    FechaFin = baseQuery  
+                        .Where(l => l.LibroId == b.Id)
+                        .Select(l => l.FechaFin)
+                        .FirstOrDefault(),
+                    Etiquetas = new List<string>
+                    {
+                b.Genero ?? "Sin género",
+                b.Subgenero ?? "Sin subgénero"
+                    }
+                })
+                .ToList();
 
             ViewBag.Filter = filter;
             return View("Index", model);
