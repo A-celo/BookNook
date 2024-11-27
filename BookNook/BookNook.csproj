@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Biblioteca\" />
     <Folder Include="Views\Logros\" />
     <Folder Include="wwwroot\imagen_libro\predeterminado\" />
     <Folder Include="wwwroot\images\" />

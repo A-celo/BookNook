@@ -458,6 +458,7 @@ background-color: #6b63e0;
     color: #e4e5e9;
 }
 
+/*Icono lapiz*/
 .edit-book-icon {
     color: var(--white);
     background-color: var(--primary-purple);
@@ -475,20 +476,58 @@ background-color: #6b63e0;
     transition: all 0.3s ease;
 }
 
-    .edit-book-icon .fas {
-        margin: 0;
-        padding: 0;
-        color: var(--white);
-    }
+.edit-book-icon .fas {
+    margin: 0;
+    padding: 0;
+    color: var(--white);
+}
 
-    .edit-book-icon:hover {
-        background-color: var(--light-purple);
-        color: var(--primary-purple);
-    }
+.edit-book-icon:hover {
+    background-color: var(--light-purple);
+    color: var(--primary-purple);
+}
 
-        .edit-book-icon:hover .fas {
-            color: var(--primary-purple);
-        }
+.edit-book-icon:hover .fas {
+    color: var(--primary-purple);
+}
 
+/*Botones*/
+.button-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.btn-add, .btn-back {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn-add {
+    background-color: var(--primary-purple);
+    color: var(--white);
+}
+
+.btn-add:hover {
+    background-color: #6b63e0;
+    color: var(--white);
+}
+
+.btn-back {
+    background-color: #64748b;
+    color: var(--white);
+}
+
+.btn-back:hover {
+    background-color: #475569;
+    color: var(--white);
+}
 
 

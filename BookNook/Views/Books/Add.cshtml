@@ -54,10 +54,11 @@
         <span asp-validation-for="ImagenPortadaFile" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Agregar Libro</button>
+    <div class="button-container">
+        <button type="submit" class="btn-add">Agregar Libro</button>
+        <a href="@Url.Action("Biblioteca", "Books")" class="btn-back">Volver a la Biblioteca</a>
+    </div>
 </form>
-
-<a href="@Url.Action("Biblioteca", "Books")" class="btn btn-secondary mt-3">Volver a la Biblioteca</a>
 
 @section Scripts {
     @{

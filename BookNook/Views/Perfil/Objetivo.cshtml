@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Establecer Objetivo de Lectura";
+}
+
+<div class="establecer-objetivo-container">
+    <h2>Establece tu objetivo de lectura para @DateTime.Now.Year</h2>
+
+    <form asp-action="EstablecerObjetivo" method="post">
+        <div class="form-group">
+            <label for="objetivoAnual">Número de libros que quieres leer este año:</label>
+            <input type="number" name="objetivoAnual" id="objetivoAnual"
+                   class="form-control" min="1" max="100" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Objetivo</button>
+    </form>
+</div>

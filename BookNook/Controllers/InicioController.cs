@@ -31,40 +31,54 @@ namespace BookNook.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            // Buscar el objetivo para el año actual
             var objetivo = _context.ObjetivosLectura
-            .Where(o => o.UsuarioId == user.Id && o.Año == DateTime.Now.Year)
-            .Select(o => new
+                .FirstOrDefault(o => o.UsuarioId == user.Id && o.Año == DateTime.Now.Year);
+
+            // Si no existe un objetivo para este año, redirigir a establecer objetivo
+            if (objetivo == null)
             {
-                o.ObjetivoAnual,
-                o.ProgresoAnual
-            })
-            .FirstOrDefault();
+                return RedirectToAction("Objetivo", "Objetivo");
+            }
+
+            var librosCompletadosEsteAño = _context.Lecturas
+                .Where(l => l.UsuarioId == user.Id &&
+                            l.FechaFin.HasValue &&
+                            l.FechaFin.Value.Year == DateTime.Now.Year)
+                .Count();
+
+            if (objetivo.ProgresoAnual != librosCompletadosEsteAño)
+            {
+                objetivo.ProgresoAnual = librosCompletadosEsteAño;
+                objetivo.LibrosLeidos = librosCompletadosEsteAño;
+                objetivo.LibrosRestantes = Math.Max(0, objetivo.ObjetivoAnual - librosCompletadosEsteAño);
+                objetivo.ActualizadoEn = DateTime.Now;
+                _context.SaveChanges();
+            }
 
             var lecturasRecientes = _context.Lecturas
-            .Where(l => l.UsuarioId == user.Id)
-            .OrderByDescending(l => l.FechaInicio)
-            .Take(5)
-            .Include(l => l.Libro)
-            .Select(l => new LecturaRecienteViewModel
-            {
-                Titulo = l.Libro != null ? l.Libro.Titulo : "Título no disponible",
-                Autor = l.Libro != null ? l.Libro.Autor : "Autor no disponible",
-                ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "",
-                AvanceLectura = l.PaginaActual.HasValue
-                    ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1))
-                    : (l.FechaFin.HasValue ? 100 : 0),
-                Fecha = l.FechaInicio.HasValue
-                ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
-                : "",
-            })
-
-            .ToList();
-
+                .Where(l => l.UsuarioId == user.Id)
+                .OrderByDescending(l => l.FechaInicio)
+                .Take(5)
+                .Include(l => l.Libro)
+                .Select(l => new LecturaRecienteViewModel
+                {
+                    Titulo = l.Libro != null ? l.Libro.Titulo : "Título no disponible",
+                    Autor = l.Libro != null ? l.Libro.Autor : "Autor no disponible",
+                    ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "",
+                    AvanceLectura = l.PaginaActual.HasValue
+                        ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1))
+                        : (l.FechaFin.HasValue ? 100 : 0),
+                    Fecha = l.FechaInicio.HasValue
+                        ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
+                        : "",
+                })
+                .ToList();
 
             var viewModel = new InicioViewModel
             {
-                ObjetivoAnual = objetivo?.ObjetivoAnual ?? 0,
-                ProgresoAnual = objetivo?.ProgresoAnual ?? 0,
+                ObjetivoAnual = objetivo.ObjetivoAnual,
+                ProgresoAnual = librosCompletadosEsteAño,
                 LecturasRecientes = lecturasRecientes
             };
 
