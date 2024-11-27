@@ -7,9 +7,6 @@ namespace BookNook.Models
     {
         public int Id { get; set; }
 
-        [StringLength(13, ErrorMessage = "El ISBN debe tener 13 caracteres.")]
-        public string Isbn { get; set; }
-
         [Required(ErrorMessage = "El título es obligatorio.")]
         [StringLength(255, ErrorMessage = "El título no puede exceder los 255 caracteres.")]
         public string Titulo { get; set; }
@@ -35,15 +32,8 @@ namespace BookNook.Models
         [Range(1, int.MaxValue, ErrorMessage = "El número de páginas debe ser un valor positivo.")]
         public int? NumeroPaginas { get; set; }
 
-        [Column("duracion_audio")]
-        [Range(1, int.MaxValue, ErrorMessage = "La duración del audio debe ser un valor positivo.")]
-        public int? DuracionAudio { get; set; }
-
         [Column("imagen_portada")]
         public string? ImagenPortada { get; set; }
-
-        [StringLength(1000, ErrorMessage = "La sinopsis no puede exceder los 1000 caracteres.")]
-        public string? Sinopsis { get; set; }
 
         [Column("creado_en")]
         public DateTime? CreadoEn { get; set; }

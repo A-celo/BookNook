@@ -15,7 +15,7 @@ namespace BookNook.Models
 
         [Required(ErrorMessage = "El año es obligatorio.")]
         [Range(1900, int.MaxValue, ErrorMessage = "El año debe ser un valor válido.")]
-        public int Año { get; set; }
+        public int? Año { get; set; }
 
         [Column("objetivo_anual")]
         [Range(0, int.MaxValue, ErrorMessage = "El objetivo anual debe ser un valor positivo.")]

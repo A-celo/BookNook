@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookNook.Models
 {
@@ -36,5 +37,10 @@ namespace BookNook.Models
         {
             Libros = new List<SelectListItem>();
         }
+
+        [Column("numero_paginas")]
+        public int? NumeroPaginas { get; set; }
+
+        public double? AvanceLectura { get; set; }
     }
 }

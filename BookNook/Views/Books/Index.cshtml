@@ -11,6 +11,13 @@
     </div>
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-4">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <div class="container">
     <div class="reading-stats-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -46,10 +53,52 @@
             {
                 <div class="book-card">
                     <img src="@item.ImagenPortada" alt="@item.Titulo" class="book-cover" />
+
+                    <a href="@Url.Action("Edit", "Books", new { id = item.Id })" class="edit-book-icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+
                     <div class="book-info">
                         <div>
                             <h5 class="mb-1">@item.Titulo</h5>
                             <p class="text-muted mb-2">@item.Autor</p>
+
+                            @if (item.FechaFin.HasValue)
+                            {
+                                <p class="text-muted mb-1">
+                                    <strong>Fechas:</strong> @item.FechaInicio?.ToString("dd/MMM/yy") - @item.FechaFin?.ToString("dd/MMM/yy")
+                                </p>
+                            }
+                            else if (item.FechaInicio.HasValue)
+                            {
+                                <p class="text-muted mb-1">
+                                    <strong>Inicio:</strong> @item.FechaInicio?.ToString("dd/MMM/yy")
+                                </p>
+                            }
+
+                            @if (item.Calificacion.HasValue && item.FechaFin.HasValue)
+                            {
+                                <div class="calificacion mb-1">
+                                    <strong>Calificación:</strong>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fas fa-star @(i <= item.Calificacion ? "text-warning" : "text-muted")"></i>
+                                    }
+                                </div>
+                            }
+
+                            @if (item.Progreso.HasValue)
+                            {
+                                <p class="text-muted">
+                                    <strong>Lectura:</strong> @item.Progreso.Value.ToString("0")%
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">
+                                    <strong>Lectura:</strong> No iniciado
+                                </p>
+                            }
                         </div>
                     </div>
                 </div>
@@ -59,8 +108,10 @@
 </div>
 
 @section Scripts {
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 }
+
 
 
 

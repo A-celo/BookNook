@@ -64,12 +64,16 @@ namespace BookNook.Controllers
             var model = booksQuery
             .Select(b => new BookViewModel
             {
+                Id = b.Id,
                 Titulo = b.Titulo ?? "Sin título",
                 Autor = b.Autor ?? "Sin autor",
                 ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
                 Progreso = lecturasQuery
                     .Where(l => l.LibroId == b.Id)
-                    .Select(l => (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas))
+                    .Select(l =>
+                        l.EstadoId == 1 ? 100 :
+                        (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas)
+                    )
                     .FirstOrDefault(),
                 FechaInicio = lecturasQuery
                     .Where(l => l.LibroId == b.Id)
@@ -183,6 +187,44 @@ namespace BookNook.Controllers
                         return RedirectToAction("Login", "Account");
                     }
 
+                    var lecturaExistente = await _context.Lecturas
+                    .FirstOrDefaultAsync(l => l.UsuarioId == int.Parse(userId) &&
+                                              l.LibroId == model.LibroId &&
+                                              l.EstadoId == model.EstadoId);
+
+                    if (lecturaExistente != null)
+                    {
+                        TempData["ErrorMessage"] = "Este libro ya tiene una lectura registrada.";
+
+                        model.Libros = await _context.Libros
+                           .Select(l => new SelectListItem
+                           {
+                               Value = l.Id.ToString(),
+                               Text = l.Titulo
+                           })
+                           .ToListAsync();
+
+                        return View(model);
+                    }
+
+                    double? avanceLectura = null; 
+
+                    if (model.EstadoId == 1) 
+                    {
+                        avanceLectura = 100.0;
+                    }
+                    else if (model.EstadoId == 3 && model.PaginaActual.HasValue && model.NumeroPaginas > 0) 
+                    {
+                        double progreso = (model.PaginaActual.Value * 100.0) / (double)model.NumeroPaginas;
+                        avanceLectura = Math.Min(progreso, 100.0);
+                    }
+                    else
+                    {
+                        avanceLectura = 0.0; 
+                    }
+
+                    model.AvanceLectura = avanceLectura;
+
                     var lectura = new Lecturas
                     {
                         UsuarioId = int.Parse(userId),
@@ -225,16 +267,165 @@ namespace BookNook.Controllers
                 TempData["ErrorMessage"] = "Error al agregar la lectura: " + ex.Message;
             }
 
-            var libros = await _context.Libros
-                .Select(l => new SelectListItem
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.Titulo
-                })
-                .ToListAsync();
+            var librosRecarga = await _context.Libros
+            .Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Titulo
+            })
+            .ToListAsync();
 
-            model.Libros = libros;
+            model.Libros = librosRecarga;
             return View(model);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            Console.WriteLine($"Attempting to edit book with ID: {id}");
+
+            try
+            {
+                if (id <= 0)
+                {
+                    Console.WriteLine($"Invalid ID: {id}");
+                    return NotFound($"Invalid book ID: {id}");
+                }
+
+                var libro = _context.Libros
+                    .Where(b => b.Id == id)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.Titulo,
+                        b.Autor,
+                        b.ImagenPortada,
+                        b.Genero,
+                        b.Subgenero,
+                        b.Idioma,
+                        NumeroPaginas = b.NumeroPaginas ?? 0,
+                        AnoPublicacion = b.AnoPublicacion ?? 0
+                    })
+                    .FirstOrDefault();
+
+                if (libro == null)
+                {
+                    Console.WriteLine($"No book found with ID: {id}");
+                    TempData["ErrorMessage"] = $"No se encontró un libro con ID {id}";
+                    return RedirectToAction("Biblioteca");
+                }
+
+                var model = new EditBookViewModel
+                {
+                    LibroId = libro.Id,
+                    Titulo = libro.Titulo,
+                    Autor = libro.Autor,
+                    ImagenPortada = libro.ImagenPortada,
+                    Genero = libro.Genero,
+                    Subgenero = libro.Subgenero,
+                    Idioma = libro.Idioma,
+                    NumeroPaginas = libro.NumeroPaginas,
+                    AnoPublicacion = libro.AnoPublicacion
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Edit action: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                TempData["ErrorMessage"] = "Ocurrió un error al intentar editar el libro.";
+                return RedirectToAction("Biblioteca");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditBookViewModel model)
+        {
+            Console.WriteLine($"Edit POST method called for book ID: {model.LibroId}");
+            Console.WriteLine($"ModelState Valid: {ModelState.IsValid}");
+
+            if (!ModelState.IsValid)
+            {
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                    }
+                }
+            }
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var libro = await _context.Libros.FindAsync(model.LibroId);
+                    if (libro == null)
+                    {
+                        Console.WriteLine($"No book found with ID: {model.LibroId}");
+                        TempData["ErrorMessage"] = "Libro no encontrado";
+                        return RedirectToAction("Biblioteca");
+                    }
+
+                    libro.Titulo = model.Titulo;
+                    libro.Autor = model.Autor;
+                    libro.Genero = model.Genero;
+                    libro.Subgenero = model.Subgenero;
+                    libro.Idioma = model.Idioma;
+                    libro.NumeroPaginas = model.NumeroPaginas;
+                    libro.AnoPublicacion = model.AnoPublicacion;
+
+                    if (model.ImagenPortadaFile != null && model.ImagenPortadaFile.Length > 0)
+                    {
+                        try
+                        {
+                            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagen_libro");
+                            if (!Directory.Exists(uploadsFolder))
+                            {
+                                Directory.CreateDirectory(uploadsFolder);
+                            }
+
+                            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.ImagenPortadaFile.FileName);
+                            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await model.ImagenPortadaFile.CopyToAsync(fileStream);
+                            }
+
+                            libro.ImagenPortada = $"/imagen_libro/{uniqueFileName}";
+                            Console.WriteLine($"Image uploaded: {libro.ImagenPortada}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Image upload error: {ex.Message}");
+                            TempData["ErrorMessage"] = "Error al subir la imagen";
+                        }
+                    }
+
+                    libro.ActualizadoEn = DateTime.Now;
+
+                    _context.Libros.Update(libro);
+                    int saveResult = await _context.SaveChangesAsync();
+
+                    Console.WriteLine($"Save changes result: {saveResult} record(s) updated");
+
+                    TempData["SuccessMessage"] = "El libro se ha actualizado con éxito.";
+                    return RedirectToAction("Biblioteca", "Books");
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Edit POST method: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                TempData["ErrorMessage"] = $"Error al guardar: {ex.Message}";
+                return View(model);
+            }
         }
 
     }

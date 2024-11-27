@@ -51,8 +51,8 @@ namespace BookNook.Controllers
                 Autor = l.Libro != null ? l.Libro.Autor : "Autor no disponible",
                 ImagenPortada = l.Libro != null ? l.Libro.ImagenPortada : "",
                 AvanceLectura = l.PaginaActual.HasValue
-                    ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1)) 
-                    : (l.FechaFin.HasValue ? 100 : 0), 
+                    ? (l.PaginaActual.Value * 100 / (l.Libro.NumeroPaginas ?? 1))
+                    : (l.FechaFin.HasValue ? 100 : 0),
                 Fecha = l.FechaInicio.HasValue
                 ? l.FechaInicio.Value.ToString("dd/MM/yyyy")
                 : "",
@@ -65,11 +65,12 @@ namespace BookNook.Controllers
             {
                 ObjetivoAnual = objetivo?.ObjetivoAnual ?? 0,
                 ProgresoAnual = objetivo?.ProgresoAnual ?? 0,
-                LecturasRecientes = lecturasRecientes  
+                LecturasRecientes = lecturasRecientes
             };
 
-            return View(viewModel); 
+            return View(viewModel);
         }
+
         public ActionResult Biblioteca()
         {
             var librosConLecturas = from libro in _context.Libros
@@ -94,19 +95,5 @@ namespace BookNook.Controllers
             return View(model);
         }
 
-        public IActionResult Lecturas()
-        {
-            return View();
-        }
-
-        public IActionResult Logros()
-        {
-            return View();
-        }
-
-        public IActionResult Perfil()
-        {
-            return View();
-        }
     }
 }

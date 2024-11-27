@@ -322,10 +322,10 @@ background-color: #6b63e0;
     margin: 2rem 0;
 }
 
-    .recent-reads h2 {
-        margin-bottom: 1.5rem;
-        color: var(--dark-text);
-    }
+.recent-reads h2 {
+    margin-bottom: 1.5rem;
+    color: var(--dark-text);
+}
 
 .books-grid {
     display: grid;
@@ -339,6 +339,7 @@ background-color: #6b63e0;
     border-radius: 1rem;
     display: flex;
     gap: 1rem;
+    position: relative;
 }
 
 .book-cover {
@@ -442,3 +443,52 @@ background-color: #6b63e0;
     display: flex;
     gap: 0.5rem;
 }
+
+/*Estrellas*/
+.fa-star {
+    font-size: 1.2rem;
+    margin-right: 2px;
+}
+
+.text-warning {
+    color: #ffc107;
+}
+
+.text-muted {
+    color: #e4e5e9;
+}
+
+.edit-book-icon {
+    color: var(--white);
+    background-color: var(--primary-purple);
+    border-radius: 50%;
+    font-size: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+    .edit-book-icon .fas {
+        margin: 0;
+        padding: 0;
+        color: var(--white);
+    }
+
+    .edit-book-icon:hover {
+        background-color: var(--light-purple);
+        color: var(--primary-purple);
+    }
+
+        .edit-book-icon:hover .fas {
+            color: var(--primary-purple);
+        }
+
+
+
