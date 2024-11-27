@@ -170,36 +170,70 @@ namespace BookNook.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddLectura(LecturaViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var lectura = new Lecturas
+                if (ModelState.IsValid)
                 {
-                    LibroId = model.LibroId,
-                    EstadoId = model.EstadoId,
-                    FechaInicio = model.FechaInicio,
-                    FechaFin = model.FechaFin,
-                    Calificacion = model.Calificacion,
-                    Notas = model.Notas,
-                    PaginaActual = model.PaginaActual
-                };
+                    var userId = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-                _context.Lecturas.Add(lectura);
-                await _context.SaveChangesAsync();
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        Console.WriteLine("Error: Usuario no encontrado");
+                        TempData["ErrorMessage"] = "Usuario no autenticado";
+                        return RedirectToAction("Login", "Account");
+                    }
 
-                TempData["SuccessMessage"] = "Lectura agregada exitosamente.";
-                return RedirectToAction("Biblioteca", "Books");
+                    var lectura = new Lecturas
+                    {
+                        UsuarioId = int.Parse(userId),
+                        LibroId = model.LibroId,
+                        EstadoId = model.EstadoId,
+                        FechaInicio = model.FechaInicio,
+                        FechaFin = model.FechaFin,
+                        Calificacion = model.Calificacion,
+                        Notas = model.Notas,
+                        PaginaActual = model.PaginaActual,
+                        CreadoEn = DateTime.Now,
+                        ActualizadoEn = DateTime.Now
+                    };
+
+                    Console.WriteLine($"Intentando agregar lectura: LibroId={lectura.LibroId}, UsuarioId={lectura.UsuarioId}, EstadoId={lectura.EstadoId}");
+
+                    _context.Lecturas.Add(lectura);
+                    await _context.SaveChangesAsync();
+
+                    Console.WriteLine("Lectura agregada exitosamente");
+                    TempData["SuccessMessage"] = "Lectura agregada exitosamente.";
+                    return RedirectToAction("Biblioteca", "Books");
+                }
+                else
+                {
+                    Console.WriteLine("ModelState no es válido:");
+                    foreach (var modelState in ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            Console.WriteLine($"Error: {error.ErrorMessage}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al guardar la lectura: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                TempData["ErrorMessage"] = "Error al agregar la lectura: " + ex.Message;
             }
 
             var libros = await _context.Libros
-            .Select(l => new SelectListItem
-            {
-                Value = l.Id.ToString(),
-                Text = l.Titulo
-            })
-            .ToListAsync();
+                .Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Titulo
+                })
+                .ToListAsync();
 
             model.Libros = libros;
-
             return View(model);
         }
 
