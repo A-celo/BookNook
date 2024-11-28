@@ -1,0 +1,68 @@
+﻿@model List<BookNook.Models.LogroViewModel>
+
+<div class="achievements-container">
+    <div class="achievements-header">
+        <h1>Mis Logros de Lectura</h1>
+        <p>Sigue tu progreso y desbloquea nuevos logros mientras exploras el maravilloso mundo de la lectura</p>
+    </div>
+
+    <div class="achievements-grid">
+        @foreach (var logro in Model)
+        {
+            <div class="achievement-card">
+                @{
+                    var (iconClass, iconColor, bgColor) = logro.Nombre switch
+                    {
+                        "Mi Primera Lectura" => ("fas fa-book-open", "#7E7AE4", "#EEF2FF"),
+                        "Explorador de Géneros" => ("fas fa-compass", "#6366F1", "#EEF2FF"),
+                        "Lector Diario" => ("fas fa-calendar-day", "#8B5CF6", "#F3E8FF"),
+                        "Maratón Literario" => ("fas fa-running", "#EC4899", "#FCE7F3"),
+                        "Lectura Rápida" => ("fas fa-bolt", "#F59E0B", "#FEF3C7"),
+                        "Biblioteca Creciente" => ("fas fa-layer-group", "#10B981", "#ECFDF5"),
+                        "Lector Multilingüe" => ("fas fa-language", "#3B82F6", "#EFF6FF"),
+                        "Super Lector" => ("fas fa-star", "#F59E0B", "#FEF3C7"),
+                        "Lector Imparable" => ("fas fa-trophy", "#6366F1", "#EEF2FF"),
+                        _ => ("fas fa-award", "#7E7AE4", "#EEF2FF")
+                    };
+                }
+
+                <div class="achievement-icon" style="background-color: @bgColor">
+                    <i class="@iconClass" style="color: @iconColor"></i>
+                </div>
+
+                <div class="achievement-content">
+                    <h3>@logro.Nombre</h3>
+                    <p>@logro.Descripcion</p>
+                </div>
+
+                <div class="achievement-progress">
+                    @if (logro.Completado)
+                    {
+                        <div class="progress-header">
+                            <span class="status completed">
+                                <i class="fas fa-check-circle"></i> ¡Completado!
+                            </span>
+                            <span class="percentage completed">100%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill completed" style="width: 100%"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="progress-header">
+                            <span class="status">
+                                <i class="fas fa-hourglass-half"></i> En progreso
+                            </span>
+                            <span class="percentage">@(logro.Progreso)%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: @(logro.Progreso)%"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
