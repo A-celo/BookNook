@@ -27,5 +27,10 @@ namespace BookNook.Models
         [Display(Name = "Confirmar nueva contraseña")]
         [Compare("NuevaContraseña", ErrorMessage = "Las contraseñas no coinciden")]
         public string? ConfirmarContraseña { get; set; }
+
+        public int? ObjetivoAnual { get; set; }
+        public int ProgresoAnual { get; set; }
+        public int LibrosLeidos { get; set; }
+        public int LibrosRestantes { get; set; }
     }
 }

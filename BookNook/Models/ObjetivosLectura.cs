@@ -36,5 +36,7 @@ namespace BookNook.Models
 
         [Column("libros_restantes")]
         public int LibrosRestantes{get; set; }
+
+        public virtual Usuarios Usuario { get; set; }
     }
 }

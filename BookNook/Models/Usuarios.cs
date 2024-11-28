@@ -18,5 +18,12 @@ namespace BookNook.Models
 
         [Required, EmailAddress]
         public string Correo { get; set; }
+
+        public virtual ICollection<ObjetivosLectura> ObjetivosLectura { get; set; }
+
+        public Usuarios()
+        {
+            ObjetivosLectura = new HashSet<ObjetivosLectura>();
+        }
     }
 }

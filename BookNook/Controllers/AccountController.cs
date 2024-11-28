@@ -108,18 +108,28 @@ namespace BookNook.Controllers
         public async Task<IActionResult> Profile()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var usuario = await _context.Usuarios.FindAsync(userId);
+
+            var usuario = await _context.Usuarios
+                .Include(u => u.ObjetivosLectura.Where(o => o.Año == DateTime.Now.Year))
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (usuario == null)
             {
                 return NotFound();
             }
 
+            var objetivoActual = usuario.ObjetivosLectura
+                .FirstOrDefault(o => o.Año == DateTime.Now.Year);
+
             var viewModel = new ProfileViewModel
             {
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
-                Correo = usuario.Correo
+                Correo = usuario.Correo,
+                ObjetivoAnual = objetivoActual?.ObjetivoAnual ?? 0,
+                ProgresoAnual = objetivoActual?.ProgresoAnual ?? 0,
+                LibrosLeidos = objetivoActual?.LibrosLeidos ?? 0,
+                LibrosRestantes = objetivoActual?.LibrosRestantes ?? 0
             };
 
             return View(viewModel);
@@ -214,6 +224,47 @@ namespace BookNook.Controllers
             }
 
             return RedirectToAction(nameof(Profile));
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ActualizarObjetivo(int objetivoAnual)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var objetivo = await _context.ObjetivosLectura
+                .FirstOrDefaultAsync(o => o.UsuarioId == userId && o.Año == DateTime.Now.Year);
+
+            if (objetivo == null)
+            {
+                objetivo = new ObjetivosLectura
+                {
+                    UsuarioId = userId,
+                    Año = DateTime.Now.Year,
+                    ObjetivoAnual = objetivoAnual,
+                    ProgresoAnual = 0,
+                    CreadoEn = DateTime.Now,
+                    LibrosLeidos = 0,
+                    LibrosRestantes = objetivoAnual
+                };
+                _context.ObjetivosLectura.Add(objetivo);
+            }
+            else
+            {
+                objetivo.ObjetivoAnual = objetivoAnual;
+                objetivo.LibrosRestantes = objetivoAnual - objetivo.LibrosLeidos;
+                objetivo.ActualizadoEn = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Objetivo de lectura actualizado correctamente";
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
     }
 }

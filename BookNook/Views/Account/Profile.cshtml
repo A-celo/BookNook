@@ -79,6 +79,26 @@
                 </form>
             </div>
         </div>
+
+        <div class="col-md-12 mb-4">
+            <div class="stats-card w-100">
+                <h4 class="mb-3">Objetivo de Lectura</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form asp-action="ActualizarObjetivo" method="post">
+                            <div class="form-group mb-3">
+                                <label for="objetivoAnual" class="form-label">Objetivo Anual de Libros</label>
+                                <input type="number" name="objetivoAnual" id="objetivoAnual"
+                                       class="form-control" value="@Model.ObjetivoAnual" min="1" required />
+                            </div>
+                            <button type="submit" class="btn-add">
+                                Actualizar Objetivo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
