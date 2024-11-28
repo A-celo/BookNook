@@ -18,6 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
@@ -45,9 +46,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseAuthentication();
-app.UseAuthorization();
 app.UseRouting();
+app.UseAuthentication();    
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
