@@ -1,5 +1,4 @@
 ﻿@model BookNook.Models.LoginViewModel
-
 @{
     Layout = "_Layout";
 }
@@ -7,16 +6,24 @@
 <div class="login-container">
     <div class="login-form-section">
         <h1 class="login-title">Log In</h1>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+        }
+
         <form asp-controller="Account" asp-action="Login" method="post">
             <div class="form-group">
-                <label for="Correo">Correo</label>
-                <input type="email" id="Correo" name="Correo" placeholder="Escribe tu email" asp-for="Correo" required />
+                <label asp-for="Correo"></label>
+                <input asp-for="Correo" class="form-control" placeholder="Escribe tu email" />
                 <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label for="Contraseña">Contraseña</label>
-                <input type="password" id="Contraseña" name="Contraseña" placeholder="Escribe tu contraseña" asp-for="Contraseña" required />
+                <label asp-for="Contraseña"></label>
+                <input asp-for="Contraseña" class="form-control" placeholder="Escribe tu contraseña" />
                 <span asp-validation-for="Contraseña" class="text-danger"></span>
             </div>
 
@@ -27,8 +34,26 @@
                 <a asp-controller="Account" asp-action="Register">Regístrate aquí</a>
             </div>
         </form>
+    </div>
 
-    <div class="login-illustration img">
+    <div class="login-illustration">
         <img src="~/images/open-book.png" alt="Book illustration" asp-append-version="true" />
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $("form").validate({
+                errorClass: "text-danger",
+                highlight: function (element) {
+                    $(element).addClass("is-invalid");
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass("is-invalid");
+                }
+            });
+        });
+    </script>
+}

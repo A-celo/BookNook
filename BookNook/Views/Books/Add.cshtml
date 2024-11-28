@@ -3,70 +3,133 @@
     ViewData["Title"] = "Agregar Libro";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<form asp-controller="Books" asp-action="Add" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="Titulo">Título</label>
-        <input type="text" class="form-control" id="Titulo" name="Titulo" asp-for="Titulo" />
-        <span asp-validation-for="Titulo" class="text-danger"></span>
-    </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
-    <div class="form-group">
-        <label for="Autor">Autor</label>
-        <input type="text" class="form-control" id="Autor" name="Autor" asp-for="Autor" />
-        <span asp-validation-for="Autor" class="text-danger"></span>
-    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 
-    <div class="form-group">
-        <label for="AnoPublicacion">Año de Publicación</label>
-        <input type="number" class="form-control" id="AnoPublicacion" name="AnoPublicacion" asp-for="AnoPublicacion" min="1000" max="9999" />
-        <span asp-validation-for="AnoPublicacion" class="text-danger"></span>
-    </div>
+    <form asp-controller="Books" asp-action="Add" method="post" enctype="multipart/form-data" id="addBookForm">
+        @Html.AntiForgeryToken()
 
-    <div class="form-group">
-        <label for="Genero">Género</label>
-        <input type="text" class="form-control" id="Genero" name="Genero" asp-for="Genero" />
-        <span asp-validation-for="Genero" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="Titulo" class="form-label"></label>
+            <input asp-for="Titulo" class="form-control" placeholder="Ingrese el título del libro" />
+            <span asp-validation-for="Titulo" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label for="Subgenero">Subgénero</label>
-        <input type="text" class="form-control" id="Subgenero" name="Subgenero" asp-for="Subgenero" />
-        <span asp-validation-for="Subgenero" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="Autor" class="form-label"></label>
+            <input asp-for="Autor" class="form-control" placeholder="Ingrese el autor del libro" />
+            <span asp-validation-for="Autor" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label for="Idioma">Idioma</label>
-        <input type="text" class="form-control" id="Idioma" name="Idioma" asp-for="Idioma" />
-        <span asp-validation-for="Idioma" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="AnoPublicacion" class="form-label"></label>
+            <input asp-for="AnoPublicacion" class="form-control" type="number" min="1000" max="2024" />
+            <span asp-validation-for="AnoPublicacion" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label for="NumeroPaginas">Número de Páginas</label>
-        <input type="number" class="form-control" id="NumeroPaginas" name="NumeroPaginas" asp-for="NumeroPaginas" />
-        <span asp-validation-for="NumeroPaginas" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="Genero" class="form-label"></label>
+            <input asp-for="Genero" class="form-control" placeholder="Ingrese el género del libro" />
+            <span asp-validation-for="Genero" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label for="ImagenPortadaFile">Imagen de Portada</label>
-        <input type="file" class="form-control" id="ImagenPortadaFile" name="ImagenPortadaFile" accept="image/*" asp-for="ImagenPortadaFile" />
-        <span asp-validation-for="ImagenPortadaFile" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="Subgenero" class="form-label"></label>
+            <input asp-for="Subgenero" class="form-control" placeholder="Ingrese el subgénero (opcional)" />
+            <span asp-validation-for="Subgenero" class="text-danger"></span>
+        </div>
 
-    <div class="button-container">
-        <button type="submit" class="btn-add">Agregar Libro</button>
-        <a href="@Url.Action("Biblioteca", "Books")" class="btn-back">Volver a la Biblioteca</a>
-    </div>
-</form>
+        <div class="form-group mb-3">
+            <label asp-for="Idioma" class="form-label"></label>
+            <input asp-for="Idioma" class="form-control" placeholder="Ingrese el idioma del libro" />
+            <span asp-validation-for="Idioma" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="NumeroPaginas" class="form-label"></label>
+            <input asp-for="NumeroPaginas" class="form-control" type="number" min="1" max="10000" />
+            <span asp-validation-for="NumeroPaginas" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="ImagenPortadaFile" class="form-label"></label>
+            <input asp-for="ImagenPortadaFile" class="form-control" type="file"
+                   accept=".jpg,.jpeg,.png,.gif"
+                   data-val="true"
+                   data-val-maxsize="El tamaño máximo permitido es 5MB"
+                   data-val-maxsize-max="5242880" />
+            <div class="form-text">Formatos permitidos: JPG, JPEG, PNG, GIF. Tamaño máximo: 5MB</div>
+            <span asp-validation-for="ImagenPortadaFile" class="text-danger"></span>
+            <div id="imagePreview" class="mt-2"></div>
+        </div>
+
+        <div class="button-container">
+            <button type="submit" class="btn-add">Agregar Libro</button>
+            <a href="@Url.Action("Biblioteca", "Books")" class="btn-back">Volver a la Biblioteca</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     }
-}
+    <script>
+        $(document).ready(function () {
+            $("#ImagenPortadaFile").change(function () {
+                const file = this.files[0];
+                const imagePreview = $("#imagePreview");
 
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+                        this.value = "";
+                        imagePreview.empty();
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        imagePreview.html(`<img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;" />`);
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.empty();
+                }
+            });
+
+            $("#AnoPublicacion").change(function () {
+                const year = parseInt($(this).val());
+                const currentYear = new Date().getFullYear();
+
+                if (year > currentYear) {
+                    alert("El año de publicación no puede ser mayor al año actual.");
+                    $(this).val(currentYear);
+                }
+            });
+
+            $("#addBookForm").submit(function (e) {
+                if ($(this).valid()) {
+                    return true;
+                }
+                e.preventDefault();
+                return false;
+            });
+        });
+    </script>
+}
 

@@ -26,44 +26,55 @@
     <input type="hidden" asp-for="LibroId" />
 
     <div class="form-group">
-        <label for="Titulo">Título</label>
-        <input type="text" class="form-control" id="Titulo" name="Titulo" value="@Model.Titulo" required />
+        <label asp-for="Titulo">Título</label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="Autor">Autor</label>
-        <input type="text" class="form-control" id="Autor" name="Autor" value="@Model.Autor" required />
+        <label asp-for="Autor">Autor</label>
+        <input asp-for="Autor" class="form-control" />
+        <span asp-validation-for="Autor" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="Genero">Género</label>
-        <input type="text" class="form-control" id="Genero" name="Genero" value="@Model.Genero" />
+        <label asp-for="Genero">Género</label>
+        <input asp-for="Genero" class="form-control" />
+        <span asp-validation-for="Genero" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="Subgenero">Subgénero</label>
-        <input type="text" class="form-control" id="Subgenero" name="Subgenero" value="@Model.Subgenero" />
+        <label asp-for="Subgenero">Subgénero</label>
+        <input asp-for="Subgenero" class="form-control" />
+        <span asp-validation-for="Subgenero" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="Idioma">Idioma</label>
-        <input type="text" class="form-control" id="Idioma" name="Idioma" value="@Model.Idioma" />
+        <label asp-for="Idioma">Idioma</label>
+        <input asp-for="Idioma" class="form-control" />
+        <span asp-validation-for="Idioma" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="NumeroPaginas">Número de páginas</label>
-        <input type="number" class="form-control" id="NumeroPaginas" name="NumeroPaginas" value="@Model.NumeroPaginas" required />
+        <label asp-for="NumeroPaginas">Número de páginas</label>
+        <input asp-for="NumeroPaginas" class="form-control" type="number" min="1" max="10000" />
+        <span asp-validation-for="NumeroPaginas" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="AnoPublicacion">Año de publicación</label>
-        <input type="number" class="form-control" id="AnoPublicacion" name="AnoPublicacion" value="@Model.AnoPublicacion" required />
+        <label asp-for="AnoPublicacion">Año de publicación</label>
+        <input asp-for="AnoPublicacion" class="form-control" type="number" min="1000" max="2024" />
+        <span asp-validation-for="AnoPublicacion" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label for="ImagenPortadaFile">Imagen de portada</label>
-        <input type="file" class="form-control" id="ImagenPortadaFile" name="ImagenPortadaFile" />
-        <img src="@Model.ImagenPortada" alt="Imagen de portada" class="img-thumbnail mt-2" style="max-width: 200px;" />
+        <label asp-for="ImagenPortadaFile">Imagen de portada</label>
+        <input asp-for="ImagenPortadaFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif" />
+        <span asp-validation-for="ImagenPortadaFile" class="text-danger"></span>
+        @if (!string.IsNullOrEmpty(Model.ImagenPortada))
+        {
+            <img src="@Model.ImagenPortada" alt="Imagen de portada" class="img-thumbnail mt-2" style="max-width: 200px;" />
+        }
     </div>
 
     <div class="button-container">

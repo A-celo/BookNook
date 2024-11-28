@@ -35,30 +35,34 @@ namespace BookNook.Controllers
             }
 
             string encryptedPassword = EncryptPassword(model.Contraseña);
-            var user = _context.Usuarios.FirstOrDefault(u =>
-                u.Correo == model.Correo &&
-                u.Contraseña == encryptedPassword);
+            var user = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Correo == model.Correo);
 
-            if (user != null)
+            if (user == null)
             {
-                var claims = new List<Claim>
+                ModelState.AddModelError("Correo", "El correo electrónico no está registrado");
+                return View(model);
+            }
+
+            if (user.Contraseña != encryptedPassword)
+            {
+                ModelState.AddModelError("Contraseña", "La contraseña es incorrecta");
+                return View(model);
+            }
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Correo)
             };
 
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                return RedirectToAction("Index", "Inicio");
-            }
-
-            ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
-            return View(model);
+            return RedirectToAction("Index", "Inicio");
         }
-
 
         public IActionResult Register()
         {
