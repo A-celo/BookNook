@@ -23,16 +23,17 @@ namespace BookNook.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var booksQuery = _context.Libros.AsQueryable();
+
+            var baseQuery = _context.Lecturas
+            .Where(l => l.UsuarioId == int.Parse(userId))
+            .Include(l => l.Libro);
+
+            var booksQuery = baseQuery.Select(l => l.Libro).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 booksQuery = booksQuery.Where(b => b.Titulo.Contains(searchTerm) || b.Autor.Contains(searchTerm));
             }
-
-            var baseQuery = _context.Lecturas
-                .Where(l => l.UsuarioId == int.Parse(userId))
-                .Include(l => l.Libro);
 
             var lecturasQuery = baseQuery.AsQueryable();
 

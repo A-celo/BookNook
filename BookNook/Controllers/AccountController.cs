@@ -84,6 +84,19 @@ namespace BookNook.Controllers
                 };
 
                 _context.Usuarios.Add(user);
+
+                var objetivoInicial = new ObjetivosLectura
+                {
+                    UsuarioId = user.Id,
+                    Año = DateTime.Now.Year,
+                    ObjetivoAnual = 12, 
+                    ProgresoAnual = 0,
+                    LibrosLeidos = 0,
+                    LibrosRestantes = 12,
+                    ActualizadoEn = DateTime.Now
+                };
+
+                _context.ObjetivosLectura.Add(objetivoInicial);
                 _context.SaveChanges();
                 return RedirectToAction("Login");
             }
