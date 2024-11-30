@@ -23,80 +23,76 @@ namespace BookNook.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var latestReadingsIds = _context.Lecturas
-                .Where(l => l.UsuarioId == int.Parse(userId))
-                .GroupBy(l => l.LibroId)
-                .Select(g => g.OrderByDescending(l => l.FechaInicio)
-                             .ThenByDescending(l => l.Id)
-                             .First().Id);
-
-            var baseQuery = _context.Lecturas
-                .Where(l => latestReadingsIds.Contains(l.Id))
-                .Include(l => l.Libro);
-
-            var booksQuery = baseQuery.Select(l => l.Libro).AsQueryable();
+            var booksQuery = _context.Libros.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 booksQuery = booksQuery.Where(b => b.Titulo.Contains(searchTerm) || b.Autor.Contains(searchTerm));
             }
 
-            var lecturasQuery = baseQuery.AsQueryable();
-
-            switch (filter)
-            {
-                case "PorLeer":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 2);
-                    break;
-                case "Leyendo":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 3);
-                    break;
-                case "Leidos":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 1);
-                    break;
-                case "DNF":
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId == 5);
-                    break;
-                default:
-                    lecturasQuery = lecturasQuery.Where(l => l.EstadoId != 0);
-                    break;
-            }
-
-            var filteredBookIds = lecturasQuery.Select(l => l.LibroId).ToList();
+            var userReadings = _context.Lecturas
+                .Where(l => l.UsuarioId == int.Parse(userId))
+                .GroupBy(l => l.LibroId)
+                .Select(g => g.OrderByDescending(l => l.FechaInicio)
+                             .ThenByDescending(l => l.Id)
+                             .First())
+                .ToList(); 
 
             if (filter != "Todos")
             {
-                booksQuery = booksQuery.Where(b => filteredBookIds.Contains(b.Id));
+                var estadoId = 0;
+                switch (filter)
+                {
+                    case "PorLeer":
+                        estadoId = 2;
+                        break;
+                    case "Leyendo":
+                        estadoId = 3;
+                        break;
+                    case "Leidos":
+                        estadoId = 1;
+                        break;
+                    case "DNF":
+                        estadoId = 5;
+                        break;
+                }
+
+                if (estadoId > 0)
+                {
+                    var filteredBookIds = userReadings
+                        .Where(l => l.EstadoId == estadoId)
+                        .Select(l => l.LibroId);
+
+                    booksQuery = booksQuery.Where(b => filteredBookIds.Contains(b.Id));
+                }
             }
 
-            var model = booksQuery
-                .Select(b => new BookViewModel
+            var books = booksQuery.ToList();
+
+            var readingsByBookId = userReadings.ToDictionary(r => r.LibroId);
+
+            var model = books.Select(b =>
+            {
+                readingsByBookId.TryGetValue(b.Id, out var lectura);
+
+                return new BookViewModel
                 {
                     Id = b.Id,
                     Titulo = b.Titulo ?? "Sin título",
                     Autor = b.Autor ?? "Sin autor",
                     ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
-                    Progreso = baseQuery
-                        .Where(l => l.LibroId == b.Id)
-                        .Select(l =>
-                            l.EstadoId == 1 ? 100 :
-                            (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas))
-                        .FirstOrDefault(),
-                    FechaInicio = baseQuery
-                        .Where(l => l.LibroId == b.Id)
-                        .Select(l => l.FechaInicio)
-                        .FirstOrDefault(),
-                    FechaFin = baseQuery
-                        .Where(l => l.LibroId == b.Id)
-                        .Select(l => l.FechaFin)
-                        .FirstOrDefault(),
+                    Progreso = lectura != null ?
+                        (lectura.EstadoId == 1 ? 100 :
+                        (int?)((lectura.PaginaActual ?? 0) * 100 / b.NumeroPaginas)) : null,
+                    FechaInicio = lectura?.FechaInicio,
+                    FechaFin = lectura?.FechaFin,
                     Etiquetas = new List<string>
-                    {
+            {
                 b.Genero ?? "Sin género",
                 b.Subgenero ?? "Sin subgénero"
-                    }
-                })
-                .ToList();
+            }
+                };
+            }).ToList();
 
             ViewBag.Filter = filter;
             return View("Index", model);

@@ -1,27 +1,67 @@
-﻿@{
-    ViewData["Title"] = "Home";
-}
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - BookNook</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BookNook.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" style="color: #7E7AE4; font-size: 24px;" asp-area="" asp-controller="Home" asp-action="Index">BookNook</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Registrarse</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-<div class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">Escape into your next great read</h1>
-        <div class="hero-text">
-            <p>Nuestra plataforma está diseñada para ayudarte a organizar tus lecturas, establecer tus metas y seguir tu progreso de manera fácil y divertida.</p>
-            <p>Disfruta de una experiencia única donde podrás llevar un registro detallado de tus libros, controlar tus objetivos de lectura y explorar nuevas formas de vivir tu pasión por la lectura.</p>
-            <p class="mt-4">¡Comienza a explorar y a vivir nuevas historias!</p>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Escape into your next great read</h1>
+                    <div class="hero-text">
+                        <p>Nuestra plataforma está diseñada para ayudarte a organizar tus lecturas, establecer tus metas y seguir tu progreso de manera fácil y divertida.</p>
+                        <p>Disfruta de una experiencia única donde podrás llevar un registro detallado de tus libros, controlar tus objetivos de lectura y explorar nuevas formas de vivir tu pasión por la lectura.</p>
+                        <p class="mt-4">¡Comienza a explorar y a vivir nuevas historias!</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-signup">Comenzar ahora</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div>&copy; 2024 - BookNook</div>
+            <div class="footer-links">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <a asp-area="" asp-controller="Home" asp-action="Terms">Terms</a>
+                <a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+            </div>
         </div>
-        <a asp-controller="Account" asp-action="Register" class="btn btn-signup">Comenzar ahora</a>
-    </div>
-    <div class="hero-image">
-        <svg viewBox="0 0 400 300" width="400" height="300">
-            <g transform="translate(100, 50)">
-                <path d="M20,180 L180,180 L160,40 L40,40 Z" fill="#e8e4f3" />
-                <path d="M40,170 L160,170 L150,60 L50,60 Z" fill="#d1c4e9" />
-                <path d="M60,160 L140,160 L135,80 L65,80 Z" fill="#b39ddb" />
-                <path d="M40,170 L160,170" stroke="#7E7AE4" stroke-width="2" fill="none" />
-                <path d="M50,160 L150,160" stroke="#7E7AE4" stroke-width="2" fill="none" />
-                <path d="M60,150 L140,150" stroke="#7E7AE4" stroke-width="2" fill="none" />
-            </g>
-        </svg>
-    </div>
-</div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

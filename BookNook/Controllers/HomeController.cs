@@ -15,7 +15,12 @@ namespace BookNook.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return View("Welcome");
+            }
+
+            return RedirectToAction("Index", "Library");
         }
 
         public IActionResult Privacy()
@@ -30,3 +35,4 @@ namespace BookNook.Controllers
         }
     }
 }
+
