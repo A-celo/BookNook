@@ -775,3 +775,9 @@ background-color: #6b63e0;
 .btn-close:focus {
     box-shadow: none;
 }
+
+.action-buttons {
+    display: flex;
+    gap: 1rem; 
+    justify-content: flex-end;
+}

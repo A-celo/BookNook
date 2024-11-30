@@ -30,12 +30,14 @@
                     </button>
                 }
             </div>
-            <a href="@Url.Action("Add", "Books")" class="btn btn-signup">
-                <i class="fas fa-plus"></i> Agregar libro
-            </a>
-            <a href="@Url.Action("AddLectura", "Books")" class="btn btn-signup">
-                <i class="fas fa-plus"></i> Agregar lectura
-            </a>
+            <div class="action-buttons">
+                <a href="@Url.Action("Add", "Books")" class="btn btn-signup">
+                    <i class="fas fa-plus"></i> Agregar libro
+                </a>
+                <a href="@Url.Action("AddLectura", "Books")" class="btn btn-signup">
+                    <i class="fas fa-plus"></i> Agregar lectura
+                </a>
+            </div>
         </div>
 
         <div class="mb-4">
@@ -52,6 +54,7 @@
             @foreach (var item in Model)
             {
                 <div class="book-card">
+
                     <img src="@item.ImagenPortada" alt="@item.Titulo" class="book-cover" />
 
                     <a href="@Url.Action("Edit", "Books", new { id = item.Id })" class="edit-book-icon">

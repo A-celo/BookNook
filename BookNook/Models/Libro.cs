@@ -42,5 +42,7 @@ namespace BookNook.Models
         public DateTime? ActualizadoEn { get; set; }
 
         public ICollection<EtiquetaLibro> EtiquetasLibros { get; set; }
+
+        public virtual ICollection<Lecturas> Lecturas { get; set; }
     }
 }

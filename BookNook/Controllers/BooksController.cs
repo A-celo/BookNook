@@ -510,7 +510,6 @@ namespace BookNook.Controllers
                 return Json(new { success = false, message = "Error al procesar la solicitud de eliminación." });
             }
         }
-
     }
 }
 
