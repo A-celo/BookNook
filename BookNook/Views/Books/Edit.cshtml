@@ -80,63 +80,6 @@
     <div class="button-container">
         <button type="submit" class="btn-add">Guardar cambios</button>
         <a href="@Url.Action("Biblioteca", "Books")" class="btn-back">Volver a la Biblioteca</a>
-        <button type="button" class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-trash"></i> Eliminar libro
-        </button>
     </div>
 </form>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar el libro "@Model.Titulo"?</p>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Esta acción no se puede deshacer. Se eliminarán todos los datos relacionados con este libro.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-back" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn-delete" onclick="deleteBook(@Model.LibroId)">Confirmar eliminación</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script>
-        function deleteBook(id) {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-            fetch(`/Books/DeleteConfirmed/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                    'RequestVerificationToken': token
-                },
-                credentials: 'include'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = '/Books/Biblioteca';
-                    } else {
-                        throw new Error(data.message || 'Error al eliminar el libro');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error.message || 'Error al eliminar el libro');
-                });
-        }
-    </script>
-}

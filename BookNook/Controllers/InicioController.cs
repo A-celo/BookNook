@@ -37,18 +37,7 @@ namespace BookNook.Controllers
 
             if (objetivo == null)
             {
-                objetivo = new ObjetivosLectura
-                {
-                    UsuarioId = user.Id,
-                    Año = DateTime.Now.Year,
-                    ObjetivoAnual = 12,
-                    ProgresoAnual = 0,
-                    LibrosLeidos = 0,
-                    LibrosRestantes = 12,
-                    ActualizadoEn = DateTime.Now
-                };
-                _context.ObjetivosLectura.Add(objetivo);
-                _context.SaveChanges();
+                return RedirectToAction("Objetivo", "Objetivo");
             }
 
             var librosCompletadosEsteAño = _context.Lecturas
