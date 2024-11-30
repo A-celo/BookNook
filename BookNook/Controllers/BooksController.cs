@@ -23,16 +23,23 @@ namespace BookNook.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var booksQuery = _context.Libros.AsQueryable();
+            var latestReadingsIds = _context.Lecturas
+                .Where(l => l.UsuarioId == int.Parse(userId))
+                .GroupBy(l => l.LibroId)
+                .Select(g => g.OrderByDescending(l => l.FechaInicio)
+                             .ThenByDescending(l => l.Id)
+                             .First().Id);
+
+            var baseQuery = _context.Lecturas
+                .Where(l => latestReadingsIds.Contains(l.Id))
+                .Include(l => l.Libro);
+
+            var booksQuery = baseQuery.Select(l => l.Libro).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 booksQuery = booksQuery.Where(b => b.Titulo.Contains(searchTerm) || b.Autor.Contains(searchTerm));
             }
-
-            var baseQuery = _context.Lecturas
-                .Where(l => l.UsuarioId == int.Parse(userId))
-                .Include(l => l.Libro);
 
             var lecturasQuery = baseQuery.AsQueryable();
 
@@ -55,7 +62,7 @@ namespace BookNook.Controllers
                     break;
             }
 
-            var filteredBookIds = lecturasQuery.Select(l => l.LibroId).Distinct().ToList();
+            var filteredBookIds = lecturasQuery.Select(l => l.LibroId).ToList();
 
             if (filter != "Todos")
             {
@@ -69,18 +76,17 @@ namespace BookNook.Controllers
                     Titulo = b.Titulo ?? "Sin título",
                     Autor = b.Autor ?? "Sin autor",
                     ImagenPortada = b.ImagenPortada ?? "/imagen_libro/predeterminado/predeterminado.jpg",
-                    Progreso = baseQuery  
+                    Progreso = baseQuery
                         .Where(l => l.LibroId == b.Id)
                         .Select(l =>
                             l.EstadoId == 1 ? 100 :
-                            (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas)
-                        )
+                            (int?)((l.PaginaActual ?? 0) * 100 / b.NumeroPaginas))
                         .FirstOrDefault(),
-                    FechaInicio = baseQuery  
+                    FechaInicio = baseQuery
                         .Where(l => l.LibroId == b.Id)
                         .Select(l => l.FechaInicio)
                         .FirstOrDefault(),
-                    FechaFin = baseQuery  
+                    FechaFin = baseQuery
                         .Where(l => l.LibroId == b.Id)
                         .Select(l => l.FechaFin)
                         .FirstOrDefault(),
@@ -104,7 +110,6 @@ namespace BookNook.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Add(NewBookViewModel model)
@@ -208,20 +213,20 @@ namespace BookNook.Controllers
                         return View(model);
                     }
 
-                    double? avanceLectura = null; 
+                    double? avanceLectura = null;
 
-                    if (model.EstadoId == 1) 
+                    if (model.EstadoId == 1)
                     {
                         avanceLectura = 100.0;
                     }
-                    else if (model.EstadoId == 3 && model.PaginaActual.HasValue && model.NumeroPaginas > 0) 
+                    else if (model.EstadoId == 3 && model.PaginaActual.HasValue && model.NumeroPaginas > 0)
                     {
                         double progreso = (model.PaginaActual.Value * 100.0) / (double)model.NumeroPaginas;
                         avanceLectura = Math.Min(progreso, 100.0);
                     }
                     else
                     {
-                        avanceLectura = 0.0; 
+                        avanceLectura = 0.0;
                     }
 
                     model.AvanceLectura = avanceLectura;
@@ -429,7 +434,86 @@ namespace BookNook.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var libro = await _context.Libros
+                .Where(b => b.Id == id)
+                .Select(b => new BookViewModel
+                {
+                    Id = b.Id,
+                    Titulo = b.Titulo,
+                    Autor = b.Autor,
+                    ImagenPortada = b.ImagenPortada,
+                    Etiquetas = new List<string> { b.Genero, b.Subgenero }
+                })
+                .FirstOrDefaultAsync();
+
+            if (libro == null)
+            {
+                TempData["ErrorMessage"] = "Libro no encontrado.";
+                return RedirectToAction(nameof(Biblioteca));
+            }
+
+            return View(libro);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Books/DeleteConfirmed/{id}")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                var libro = await _context.Libros.FindAsync(id);
+                if (libro == null)
+                {
+                    return Json(new { success = false, message = "Libro no encontrado." });
+                }
+
+                try
+                {
+                    var lecturasAsociadas = _context.Lecturas.Where(l => l.LibroId == id);
+                    _context.Lecturas.RemoveRange(lecturasAsociadas);
+
+                    if (!string.IsNullOrEmpty(libro.ImagenPortada) &&
+                        !libro.ImagenPortada.Contains("predeterminado.jpg"))
+                    {
+                        var imagePath = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot",
+                            libro.ImagenPortada.TrimStart('/')
+                        );
+
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
+                    }
+
+                    _context.Libros.Remove(libro);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "El libro se ha eliminado correctamente.";
+                    return Json(new { success = true, message = "Libro eliminado correctamente" });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al eliminar el libro o su imagen: {ex.Message}");
+                    return Json(new { success = false, message = $"Error al eliminar: {ex.Message}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error general al eliminar el libro: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                return Json(new { success = false, message = "Error al procesar la solicitud de eliminación." });
+            }
+        }
+
     }
 }
+
+
 
 
